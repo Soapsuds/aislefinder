@@ -1,8 +1,3 @@
-# curl -X POST \
-#   'https://api.kroger.com/v1/connect/oauth2/token' \
-#   -H 'Content-Type: application/x-www-form-urlencoded' \
-#   -H 'Authorization: Basic YWlzbGVmaW5kZXIzMDAwLWJiYzZnYjNsOlNyaUFFQzcwUFpHQ2dwTHF1YXc0bGxuaHFJdjBqMlpQYS1kRUxoZ3E=' \
-#   -d 'grant_type=client_credentials'
 import base64
 import requests
 
