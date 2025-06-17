@@ -1,6 +1,6 @@
 from grocery_organizer.src.core.models import FullProduct
 
-
+# TODO need to consider output_format option in main
 class OutputFormatter:
     def __init__(self, products:[FullProduct]):
         self.products=products
