@@ -1,6 +1,9 @@
+import os.path
+
+
 class InputParser:
     def __init__(self, file):
-        self.file=file
+        self.file=os.path.abspath(file)
 
     # TODO branch based on file type
     # Image files should use handwritting recognition
