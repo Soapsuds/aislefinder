@@ -4,3 +4,6 @@ class FullProduct:
         self.found_product = found_product
         self.category = category
         self.aisle_number = aisle_number
+
+    def __str__(self):
+        return self.input_name + '\t' + self.found_product

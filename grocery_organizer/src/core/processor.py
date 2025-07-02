@@ -39,7 +39,7 @@ class GroceryListProcessor:
         for item in grocery_list:
             product_data.append(api_client.find_product(item))
 
-        formatter=OutputFormatter(product_data)
+        formatter=OutputFormatter(product_data, self.output_format)
 
         # Format list
         return formatter.format_output()
