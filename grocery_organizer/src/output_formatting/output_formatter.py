@@ -16,11 +16,16 @@ class OutputFormatter:
     def aisle_format(self):
         aisle_groups = defaultdict(list)
         for product in self.products:
-            aisle_groups[product.aisle_number].append(product)
+            if product.aisle_number > 0:
+                aisle_groups[product.aisle_number].append(product)
+            else:
+                aisle_groups[product.category].append(product)
 
         formatted_string = ''
-        for aisle, products in aisle_groups.items():
-            formatted_string += 'Aisle ' + aisle + '\n'
+
+        #Sort by aisle. When category is present instead sort by these first
+        for aisle, products in sorted(aisle_groups.items(), key=lambda element: (isinstance(element[0], str), element[0])):
+            formatted_string += 'Aisle ' + str(aisle) + '\n'
             for product in products:
                 formatted_line = str(product) + '\n'
                 formatted_string += formatted_line
@@ -40,5 +45,6 @@ class OutputFormatter:
             for product in products:
                 formatted_line = str(product) + '\n'
                 formatted_string += formatted_line
+            formatted_string += '\n'
 
         return formatted_string

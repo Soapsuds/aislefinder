@@ -38,14 +38,12 @@ class KrogerAPI:
         return token
 
     def find_product(self, product_name):
-        #TODO don't get everytime
         #Prepare API Request
         token = self.get_auth_token()
         headers = {'Authorization': 'Bearer ' + token, 'Cache-Control': 'no-cache'}
         payload = {'filter.term': product_name, 'filter.locationId': self.store_id}
         response = requests.get(self.PRODUCT_URL, headers=headers, params=payload)
 
-        #TODO response error checking
         product_data = response.json()['data'][0]
 
         #extract response into object
@@ -53,7 +51,7 @@ class KrogerAPI:
             product_name,
             product_data['description'],
             product_data['categories'][0],
-            product_data['aisleLocations'][0]['number']
+            int(product_data['aisleLocations'][0]['number']) if len(product_data['aisleLocations']) > 0 else -1
         )
 
         return found_product

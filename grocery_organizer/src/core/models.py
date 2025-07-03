@@ -6,4 +6,4 @@ class FullProduct:
         self.aisle_number = aisle_number
 
     def __str__(self):
-        return self.input_name + '\t' + self.found_product
+        return self.input_name + '\t(' + self.found_product + ')'
