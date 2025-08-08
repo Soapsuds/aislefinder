@@ -4,7 +4,7 @@ from src.core.processor import GroceryListProcessor
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--file", default="./list.txt")
-    parser.add_argument("--output_format", choices=["aisle","section"], default="aisle")
+    parser.add_argument("--output_format", choices=["aisle","category"], default="category")
     parser.add_argument("--store", default="4500S Smiths")
 
     args = parser.parse_args()
