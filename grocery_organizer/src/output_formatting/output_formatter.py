@@ -21,17 +21,16 @@ class OutputFormatter:
             else:
                 aisle_groups[product.category].append(product)
 
-        formatted_string = ''
+        formatted_sections = []
 
         #Sort by aisle. When category is present instead sort by these first
         for aisle, products in sorted(aisle_groups.items(), key=lambda element: (isinstance(element[0], str), element[0])):
-            formatted_string += 'Aisle ' + str(aisle) + '\n'
+            section = '## Aisle ' + str(aisle)
             for product in products:
-                formatted_line = str(product) + '\n'
-                formatted_string += formatted_line
-            formatted_string += '\n'
+                section += '- ' + str(product) + '\n'
+            formatted_sections.append(section.strip())
 
-        return formatted_string
+        return '\n\n'.join(formatted_sections)
 
     def category_format(self):
         # Group items by their section in the store
@@ -39,12 +38,11 @@ class OutputFormatter:
         for item in self.products:
             grouped_items[item.category].append(item)
 
-        formatted_string = ''
+        formatted_sections = []
         for category, products in grouped_items.items():
-            formatted_string += category + '\n'
+            section = '## ' + category
             for product in products:
-                formatted_line = str(product) + '\n'
-                formatted_string += formatted_line
-            formatted_string += '\n'
+                section += '- ' + str(product) + '\n'
+            formatted_sections.append(section.strip())
 
-        return formatted_string
+        return '\n\n'.join(formatted_sections)

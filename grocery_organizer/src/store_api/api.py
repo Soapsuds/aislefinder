@@ -9,6 +9,7 @@ class KrogerAPI:
 
     AUTH_URL = 'https://api.kroger.com/v1/connect/oauth2/token'
     PRODUCT_URL = 'https://api.kroger.com/v1/products'
+    LOCATIONS_URL = 'https://api.kroger.com/v1/locations'
     CLIENT_ID = 'aislefinder4000-bbc6d2p3'
 
     #TODO need to take location as an option
@@ -55,3 +56,28 @@ class KrogerAPI:
         )
 
         return found_product
+
+    def find_stores_by_zip(self, zip_code):
+        """Find Kroger stores by zip code"""
+        token = self.get_auth_token()
+        headers = {'Authorization': 'Bearer ' + token, 'Cache-Control': 'no-cache'}
+        payload = {'filter.zipCode.near': zip_code, 'filter.radiusInMiles': 25, 'filter.limit': 10}
+        
+        response = requests.get(self.LOCATIONS_URL, headers=headers, params=payload)
+        
+        if response.status_code != 200:
+            return []
+            
+        locations_data = response.json().get('data', [])
+        
+        stores = []
+        for location in locations_data:
+            store = {
+                'id': location['locationId'],
+                'name': location['name'],
+                'address': f"{location['address']['addressLine1']}, {location['address']['city']}, {location['address']['state']} {location['address']['zipCode']}",
+                'distance': location.get('distance', 0)
+            }
+            stores.append(store)
+            
+        return stores
