@@ -10,6 +10,7 @@ project_root = Path(__file__).parent
 sys.path.append(str(project_root))
 
 from grocery_organizer.src.core.processor import GroceryListProcessor
+from grocery_organizer.src.store_api.api import KrogerAPI
 
 app = Flask(__name__)
 CORS(app)
@@ -33,9 +34,10 @@ def process_grocery_list():
 
         # Get optional parameters
         output_format = request.form.get('output_format', 'aisle')
+        store_id = request.form.get('store_id', '01400943')
         store = request.form.get('store', '4500S Smiths')
         
-        print(f"Output format: {output_format}, Store: {store}")
+        print(f"Output format: {output_format}, Store: {store}, Store ID: {store_id}")
 
         # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(mode='w+', suffix='.txt', delete=False) as temp_file:
@@ -52,7 +54,8 @@ def process_grocery_list():
             processor = GroceryListProcessor(
                 file=temp_file_path,
                 store=store,
-                output_format=output_format
+                output_format=output_format,
+                store_id=store_id
             )
             print("Processing list...")
             result = processor.process_list()
@@ -68,6 +71,29 @@ def process_grocery_list():
             
     except Exception as e:
         print(f"Error processing grocery list: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
+
+@app.route('/api/find-stores', methods=['POST'])
+def find_stores():
+    try:
+        data = request.get_json()
+        if not data or 'zipCode' not in data:
+            return jsonify({'error': 'Zip code is required'}), 400
+            
+        zip_code = data['zipCode']
+        print(f"Searching for stores near zip code: {zip_code}")
+        
+        # Create API client and search for stores
+        api_client = KrogerAPI()
+        stores = api_client.find_stores_by_zip(zip_code)
+        
+        print(f"Found {len(stores)} stores")
+        return jsonify({'stores': stores}), 200
+        
+    except Exception as e:
+        print(f"Error finding stores: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': f'Server error: {str(e)}'}), 500
