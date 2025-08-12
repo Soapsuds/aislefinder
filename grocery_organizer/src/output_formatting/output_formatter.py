@@ -23,18 +23,30 @@ class OutputFormatter:
 
         formatted_sections = []
 
-        # Sort by aisle, but put "Not Found" at the end
+        # Optimal shopping order with food safety considerations
         def sort_key(element):
             key, products = element
             if isinstance(key, str):
-                if key == "Not Found":
-                    return (2, key)  # Put "Not Found" last
+                # Special category ordering for optimal shopping
+                if key == "Produce":
+                    return (0, "Produce")  # First - fresh items
+                elif key == "Deli":
+                    return (0, "Deli")  # Second - fresh items  
+                elif key.lower() in ["frozen", "frozen foods", "frozen section"]:
+                    return (3, key)  # Near end for food safety
+                elif key.lower() in ["dairy", "milk", "dairy products"]:
+                    return (3, key)  # Near end for food safety
+                elif key == "Not Found":
+                    return (4, key)  # Last
                 else:
-                    return (1, key)  # Other categories after aisles
+                    return (1, key)  # Other categories after produce/deli, before frozen/dairy
             else:
-                return (0, key)  # Aisles first
+                return (2, key)  # Numbered aisles in ascending order
 
-        for aisle, products in sorted(aisle_groups.items(), key=sort_key):
+        # Sort all items
+        sorted_items = sorted(aisle_groups.items(), key=sort_key)
+        
+        for aisle, products in sorted_items:
             if isinstance(aisle, str):
                 section = '## ' + aisle + '\n'
             else:
@@ -52,8 +64,23 @@ class OutputFormatter:
             grouped_items[item.category].append(item)
 
         formatted_sections = []
-        # Sort categories, but put "Not Found" at the end
-        sorted_categories = sorted(grouped_items.keys(), key=lambda x: (x == "Not Found", x))
+        
+        # Use same optimal shopping order as aisle format
+        def category_sort_key(category):
+            if category == "Produce":
+                return (0, "Produce")
+            elif category == "Deli":
+                return (0, "Deli")
+            elif category.lower() in ["frozen", "frozen foods", "frozen section"]:
+                return (2, category)
+            elif category.lower() in ["dairy", "milk", "dairy products"]:
+                return (2, category)
+            elif category == "Not Found":
+                return (3, category)
+            else:
+                return (1, category)
+        
+        sorted_categories = sorted(grouped_items.keys(), key=category_sort_key)
         
         for category in sorted_categories:
             products = grouped_items[category]
