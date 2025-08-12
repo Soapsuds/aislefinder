@@ -4,6 +4,10 @@ import tempfile
 import os
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file for local development
+load_dotenv()
 
 # Add the project to Python path
 project_root = Path(__file__).parent
@@ -13,7 +17,8 @@ from grocery_organizer.src.core.processor import GroceryListProcessor
 from grocery_organizer.src.store_api.api import KrogerAPI
 
 app = Flask(__name__)
-CORS(app)
+# Allow CORS for both local development and production domains
+CORS(app, origins=['http://localhost:3000', 'https://aislefinder3000.com'])
 
 @app.route('/api/process-grocery-list', methods=['POST'])
 def process_grocery_list():
@@ -103,4 +108,7 @@ def health_check():
     return jsonify({'status': 'healthy'}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    import os
+    port = int(os.environ.get('PORT', 5001))
+    debug_mode = os.environ.get('FLASK_ENV') == 'development'
+    app.run(debug=debug_mode, host='0.0.0.0', port=port)

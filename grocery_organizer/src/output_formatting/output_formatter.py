@@ -23,9 +23,22 @@ class OutputFormatter:
 
         formatted_sections = []
 
-        #Sort by aisle. When category is present instead sort by these first
-        for aisle, products in sorted(aisle_groups.items(), key=lambda element: (isinstance(element[0], str), element[0])):
-            section = '## Aisle ' + str(aisle)
+        # Sort by aisle, but put "Not Found" at the end
+        def sort_key(element):
+            key, products = element
+            if isinstance(key, str):
+                if key == "Not Found":
+                    return (2, key)  # Put "Not Found" last
+                else:
+                    return (1, key)  # Other categories after aisles
+            else:
+                return (0, key)  # Aisles first
+
+        for aisle, products in sorted(aisle_groups.items(), key=sort_key):
+            if isinstance(aisle, str):
+                section = '## ' + aisle + '\n'
+            else:
+                section = '## Aisle ' + str(aisle) + '\n'
             for product in products:
                 section += '- ' + str(product) + '\n'
             formatted_sections.append(section.strip())
@@ -39,8 +52,12 @@ class OutputFormatter:
             grouped_items[item.category].append(item)
 
         formatted_sections = []
-        for category, products in grouped_items.items():
-            section = '## ' + category
+        # Sort categories, but put "Not Found" at the end
+        sorted_categories = sorted(grouped_items.keys(), key=lambda x: (x == "Not Found", x))
+        
+        for category in sorted_categories:
+            products = grouped_items[category]
+            section = '## ' + category + '\n'
             for product in products:
                 section += '- ' + str(product) + '\n'
             formatted_sections.append(section.strip())

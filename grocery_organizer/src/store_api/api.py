@@ -1,9 +1,30 @@
 import base64
 import requests
 import time
+import os
+from functools import wraps
 
 from grocery_organizer.src.core.models import FullProduct
-from grocery_organizer.src.core.secrets import CLIENT_SECRET
+
+def retry_api_call(max_retries=3, backoff_factor=1):
+    """Decorator to retry API calls with exponential backoff"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except (requests.exceptions.RequestException, KeyError, IndexError, ValueError) as e:
+                    if attempt == max_retries - 1:
+                        print(f"API call failed after {max_retries} attempts: {e}")
+                        raise
+                    
+                    wait_time = backoff_factor * (2 ** attempt)
+                    print(f"API call attempt {attempt + 1} failed: {e}. Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+            return None
+        return wrapper
+    return decorator
 
 class KrogerAPI:
 
@@ -18,11 +39,16 @@ class KrogerAPI:
         self.access_token = None
         self.token_expiration = 0
 
+    @retry_api_call(max_retries=3, backoff_factor=1)
     def get_auth_token(self):
         if self.access_token is not None and time.time() < self.token_expiration:
             return self.access_token
 
-        auth_code = self.CLIENT_ID + ':' + CLIENT_SECRET
+        client_secret = os.getenv('KROGER_CLIENT_SECRET')
+        if not client_secret:
+            raise ValueError("KROGER_CLIENT_SECRET environment variable is required")
+        
+        auth_code = self.CLIENT_ID + ':' + client_secret
 
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -31,21 +57,53 @@ class KrogerAPI:
         data = {'grant_type': 'client_credentials', 'scope': 'product.compact'}
 
         response = requests.post(self.AUTH_URL, headers = headers, data=data)
+        response.raise_for_status()  # Raise an exception for bad status codes
 
-        token = response.json()['access_token']
+        response_data = response.json()
+        token = response_data['access_token']
         self.access_token = token
-        self.token_expiration = time.time() + response.json()['expires_in'] - 60 #refresh one minute before our token expires
+        self.token_expiration = time.time() + response_data['expires_in'] - 60 #refresh one minute before our token expires
 
         return token
 
+    @retry_api_call(max_retries=3, backoff_factor=1)
     def find_product(self, product_name):
         #Prepare API Request
         token = self.get_auth_token()
         headers = {'Authorization': 'Bearer ' + token, 'Cache-Control': 'no-cache'}
         payload = {'filter.term': product_name, 'filter.locationId': self.store_id}
         response = requests.get(self.PRODUCT_URL, headers=headers, params=payload)
+        response.raise_for_status()  # Raise an exception for bad status codes
 
-        product_data = response.json()['data'][0]
+        response_data = response.json()
+        if not response_data.get('data') or len(response_data['data']) == 0:
+            print(f"No product data found for: {product_name}, adding to Not Found")
+            return FullProduct(
+                product_name,
+                f"{product_name} (not found in store)",
+                "Not Found",
+                -1  # Unknown aisle
+            )
+
+        product_data = response_data['data'][0]
+        
+        # Validate product relevance
+        if not self._is_product_relevant(product_name, product_data):
+            # Try to find a better match from other results
+            for alt_product in response_data['data'][:3]:  # Check first 3 results
+                if self._is_product_relevant(product_name, alt_product):
+                    product_data = alt_product
+                    print(f"Found better match for '{product_name}': {alt_product['description']}")
+                    break
+            else:
+                # No good match found, put in "Not Found" category
+                print(f"Warning: No relevant product found for '{product_name}', adding to Not Found")
+                return FullProduct(
+                    product_name,
+                    f"{product_name} (not found in store)",
+                    "Not Found",
+                    -1  # Unknown aisle
+                )
 
         #extract response into object
         found_product = FullProduct(
@@ -56,7 +114,41 @@ class KrogerAPI:
         )
 
         return found_product
+    
+    def _is_product_relevant(self, search_term, product_data):
+        """Check if the returned product is relevant to the search term"""
+        search_words = set(search_term.lower().split())
+        description = product_data.get('description', '').lower()
+        
+        # Remove common words that don't help with matching
+        common_words = {'the', 'and', 'or', 'with', 'in', 'on', 'at', 'to', 'for', 'of', 'a', 'an'}
+        search_words = search_words - common_words
+        
+        if not search_words:
+            return True  # If only common words, accept the match
+        
+        # Check if any search word appears in the product description
+        for word in search_words:
+            if len(word) >= 3 and word in description:
+                return True
+        
+        # Special cases for common mismatches
+        irrelevant_indicators = [
+            'gift card', 'digital', 'download', 'membership', 'subscription',
+            'delivery fee', 'service charge', 'warranty', 'insurance'
+        ]
+        
+        for indicator in irrelevant_indicators:
+            if indicator in description:
+                return False
+        
+        # If search term is very short, be more lenient
+        if len(search_term.strip()) <= 3:
+            return True
+            
+        return False
 
+    @retry_api_call(max_retries=3, backoff_factor=1)
     def find_stores_by_zip(self, zip_code):
         """Find Kroger stores by zip code"""
         token = self.get_auth_token()
@@ -64,14 +156,16 @@ class KrogerAPI:
         payload = {'filter.zipCode.near': zip_code, 'filter.radiusInMiles': 25, 'filter.limit': 10}
         
         response = requests.get(self.LOCATIONS_URL, headers=headers, params=payload)
+        response.raise_for_status()  # Raise an exception for bad status codes
         
-        if response.status_code != 200:
-            return []
-            
-        locations_data = response.json().get('data', [])
+        response_data = response.json()
+        locations_data = response_data.get('data', [])
         
         stores = []
         for location in locations_data:
+            if not all(key in location for key in ['locationId', 'name', 'address']):
+                continue  # Skip malformed location data
+                
             store = {
                 'id': location['locationId'],
                 'name': location['name'],
