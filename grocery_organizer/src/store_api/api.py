@@ -2,6 +2,7 @@ import base64
 import requests
 import time
 import os
+import re
 from functools import wraps
 
 from grocery_organizer.src.core.models import FullProduct
@@ -66,12 +67,56 @@ class KrogerAPI:
 
         return token
 
+    def _preprocess_search_term(self, product_name):
+        """Clean up search term by removing numbers, quantities, and filler words"""
+        # Convert to lowercase for processing
+        cleaned = product_name.lower().strip()
+        
+        # Remove common quantity words and numbers
+        quantity_patterns = [
+            r'\b\d+\s*(lbs?|pounds?|oz|ounces?|grams?|kg|kilograms?)\b',  # weights
+            r'\b\d+\s*(gallons?|quarts?|pints?|cups?|liters?|ml)\b',      # volumes
+            r'\b\d+\s*(packs?|packages?|boxes?|bags?|containers?|jars?|cans?|bottles?)\b',  # containers
+            r'\b\d+\s*(loaves?|cartons?|dozens?|bunches?|heads?)\b',      # specific units
+            r'\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+(lbs?|pounds?|gallons?|cartons?|loaves?|dozens?|bunches?|heads?)\b',  # written numbers with units
+            r'\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+',  # written numbers
+            r'\ba\s+dozen\b',  # "a dozen"
+            r'\b\d+\s+',  # any remaining standalone numbers
+        ]
+        
+        for pattern in quantity_patterns:
+            cleaned = re.sub(pattern, ' ', cleaned)
+        
+        # Remove filler words that don't help with product matching
+        filler_words = [
+            'of', 'a', 'an', 'the', 'some', 'any', 'fresh', 'organic', 'natural',
+            'large', 'small', 'medium', 'big', 'little', 'extra', 'super',
+            'pack', 'package', 'container', 'bag', 'box', 'jar', 'can', 'bottle'
+        ]
+        
+        # Split into words and filter
+        words = cleaned.split()
+        filtered_words = [word for word in words if word not in filler_words and len(word) > 1]
+        
+        # Rejoin and clean up extra spaces
+        result = ' '.join(filtered_words).strip()
+        
+        # If we filtered everything out, use original term
+        if not result:
+            result = product_name.strip()
+            
+        return result
+
     @retry_api_call(max_retries=3, backoff_factor=1)
     def find_product(self, product_name):
+        # Clean up the search term before calling API
+        cleaned_search_term = self._preprocess_search_term(product_name)
+        print(f"Searching for '{product_name}' -> cleaned: '{cleaned_search_term}'")
+        
         #Prepare API Request
         token = self.get_auth_token()
         headers = {'Authorization': 'Bearer ' + token, 'Cache-Control': 'no-cache'}
-        payload = {'filter.term': product_name, 'filter.locationId': self.store_id}
+        payload = {'filter.term': cleaned_search_term, 'filter.locationId': self.store_id}
         response = requests.get(self.PRODUCT_URL, headers=headers, params=payload)
         response.raise_for_status()  # Raise an exception for bad status codes
 
@@ -87,11 +132,11 @@ class KrogerAPI:
 
         product_data = response_data['data'][0]
         
-        # Validate product relevance
-        if not self._is_product_relevant(product_name, product_data):
+        # Validate product relevance using both original and cleaned search terms
+        if not self._is_product_relevant(product_name, product_data) and not self._is_product_relevant(cleaned_search_term, product_data):
             # Try to find a better match from other results
             for alt_product in response_data['data'][:3]:  # Check first 3 results
-                if self._is_product_relevant(product_name, alt_product):
+                if self._is_product_relevant(product_name, alt_product) or self._is_product_relevant(cleaned_search_term, alt_product):
                     product_data = alt_product
                     print(f"Found better match for '{product_name}': {alt_product['description']}")
                     break
