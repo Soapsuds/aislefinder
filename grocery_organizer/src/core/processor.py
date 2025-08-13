@@ -22,10 +22,11 @@ class GroceryListProcessor:
     4. Final grocery list generation and formatting
     """
 
-    def __init__(self, file, store, output_format):
+    def __init__(self, file, store, output_format, store_id="01400943"):
         self.file=file
         self.store=store
         self.output_format=output_format
+        self.store_id=store_id
 
     def process_list(self):
         # Parse file
@@ -33,7 +34,7 @@ class GroceryListProcessor:
         grocery_list=parser.text_parser()
 
         # Call API
-        api_client = KrogerAPI()
+        api_client = KrogerAPI(store_id=self.store_id)
 
         product_data = []
         for item in grocery_list:
