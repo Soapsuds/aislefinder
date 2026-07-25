@@ -128,9 +128,9 @@ const CertBadge = ({ label }) => (
     fontSize: '10px',
     fontWeight: 700,
     letterSpacing: '0.3px',
-    background: 'rgba(39,174,96,0.13)',
+    background: 'rgba(31,95,160,0.13)',
     color: 'var(--af-green-dark)',
-    border: '1px solid rgba(39,174,96,0.28)',
+    border: '1px solid rgba(31,95,160,0.28)',
     marginRight: '4px',
     marginBottom: '4px',
   }}>
@@ -395,6 +395,8 @@ const ItemInfoSheet = ({ item, store, onClose }) => {
         </button>
 
         <div style={{ textAlign: 'center', minHeight: '120px', paddingRight: '20px' }}>
+          {humanePick && <HumanePick pick={humanePick} />}
+
           {state.status === 'loading' && (
             <div style={{ padding: '30px 0', color: 'var(--af-text-muted)', fontSize: '13px' }}>
               <div className="loading-icon-0" style={{ fontSize: '22px', color: 'var(--af-green)', marginBottom: '10px' }}>
@@ -411,18 +413,13 @@ const ItemInfoSheet = ({ item, store, onClose }) => {
           )}
 
           {state.status === 'done' && results.length === 0 && (
-            <>
-              <div style={{ padding: '30px 0 14px', color: 'var(--af-text-muted)', fontSize: '13px' }}>
-                No match for this item at {store ? store.name : 'this store'}.
-              </div>
-              {humanePick && <HumanePick pick={humanePick} />}
-            </>
+            <div style={{ padding: '30px 0 14px', color: 'var(--af-text-muted)', fontSize: '13px' }}>
+              No match for this item at {store ? store.name : 'this store'}.
+            </div>
           )}
 
           {details && (
             <>
-              {humanePick && <HumanePick pick={humanePick} />}
-
               {details.image && (
                 <div style={{
                   background: 'white',

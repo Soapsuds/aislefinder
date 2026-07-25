@@ -22,22 +22,24 @@ The core palette is nine colors per scheme:
 ```css
 :root {
   --af-bg: #ffffff;          /* page background */
-  --af-surface: #f5f7f5;     /* cards, panels */
-  --af-border: #e2e8e3;
-  --af-text: #24312a;
-  --af-text-muted: #68746c;
-  --af-green: #27ae60;       /* the brand color — primary actions */
-  --af-green-dark: #157a40;  /* hover states, emphasis */
-  --af-amber: #ffc439;       /* the one accent — highlights, stars */
+  --af-surface: #e4edf6;     /* cards, panels */
+  --af-border: #d9e7f2;
+  --af-text: #1c2a3a;
+  --af-text-muted: #5f7183;
+  --af-green: #1f5fa0;       /* the brand color — primary actions (navy, despite the name) */
+  --af-green-dark: #153f6e;  /* hover states, emphasis */
+  --af-amber: #ffb52e;       /* the one accent — highlights, stars */
   --af-error-text: #b3541e;
 }
 ```
 
 Everything else is **derived** — either an alias
 (`--af-focus: var(--af-green)`) or an alpha tint
-(`--af-highlight-bg: rgba(39, 174, 96, 0.07)`). This is the discipline that
+(`--af-highlight-bg: rgba(31, 95, 160, 0.07)`). This is the discipline that
 keeps the palette coherent: new UI needs zero new colors, and a rebrand
-would touch nine lines.
+would touch nine lines. (Current scheme: "Ocean Fresh — Amber Nav" — the
+`--af-green*` names are historical, kept for a minimal diff; they hold navy
+blue, not green.)
 
 ## 6.2 Dark mode for free
 
@@ -47,11 +49,11 @@ query that redefines them:
 ```css
 @media (prefers-color-scheme: dark) {
   :root {
-    --af-bg: #121412;
-    --af-surface: #1e231f;
-    --af-text: #e7ece8;
-    --af-green: #3fd07f;        /* brighter — dark backgrounds eat saturation */
-    --af-green-dark: #8fe6b4;   /* note: *lighter* in dark mode — it means "emphasis" */
+    --af-bg: #0d1420;
+    --af-surface: #1a2636;
+    --af-text: #e1e7ee;
+    --af-green: #3f7fc4;        /* brighter — dark backgrounds eat saturation */
+    --af-green-dark: #96bee6;   /* note: *lighter* in dark mode — it means "emphasis" */
     --af-error-text: #ffab70;
     /* ... */
   }
@@ -70,8 +72,9 @@ the two schemes.
 
 These are project law (see `CLAUDE.md` and `docs/design-rules.html`):
 
-1. **Green-only palette + amber accent.** No blues, no new hues. If a
-   design feels like it needs another color, it needs a different design.
+1. **One accent hue + amber highlight.** No new hues beyond the core `--af-green*`
+   pair (currently navy) and `--af-amber`. If a design feels like it needs
+   another color, it needs a different design.
 2. **No gradients in UI.** The logo (`src/components/Logo.jsx`,
    `public/logo.svg` — the green shelf-"A" monogram) is the single
    exception.

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AisleFinder — 20 Icon &amp; Logo Concepts</title>
+<style>
+  :root {
+    --bg: #f6faf6;
+    --inset: #ffffff;
+    --surface: #e9f0e9;
+    --border: #dfe8df;
+    --text: #22332a;
+    --muted: #6e7c71;
+    --green: #27ae60;
+    --green-dark: #175c3d;
+    --amber: #ffc439;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #131816; --inset: #1b2320; --surface: #232c27;
+      --border: #33403a; --text: #e6ebe6; --muted: #9cab9f;
+      --green: #4cb782; --green-dark: #9ecfb2;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #131816; --inset: #1b2320; --surface: #232c27;
+    --border: #33403a; --text: #e6ebe6; --muted: #9cab9f;
+    --green: #4cb782; --green-dark: #9ecfb2;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6faf6; --inset: #ffffff; --surface: #e9f0e9;
+    --border: #dfe8df; --text: #22332a; --muted: #6e7c71;
+    --green: #27ae60; --green-dark: #175c3d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+    padding: 40px 20px 70px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.2px; }
+  .sub {
+    color: var(--muted); font-size: 13.5px; margin: 0 0 6px; max-width: 640px;
+  }
+  .src {
+    font-size: 11.5px; color: var(--muted); background: var(--surface);
+    border-radius: 6px; padding: 2px 8px; font-family: Menlo, Consolas, monospace;
+  }
+  h2 {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px;
+    color: var(--muted); margin: 46px 0 4px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2 span.count { color: var(--text); }
+  p.section-note { font-size: 13px; color: var(--muted); margin: 0 0 18px; max-width: 720px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--inset);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card .tile-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 108px;
+  }
+  .icon-tile {
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+    background: #1d5c40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .icon-tile svg { width: 60px; height: 60px; }
+  .card h3 {
+    font-size: 13.5px; margin: 0; display: flex; align-items: baseline; gap: 6px;
+  }
+  .card h3 .num {
+    font-size: 10.5px; color: var(--muted); font-weight: 700;
+    font-family: Menlo, Consolas, monospace;
+  }
+  .card p {
+    font-size: 12px; color: var(--muted); margin: 0;
+  }
+
+  /* Lockup cards are wider and show icon + wordmark together */
+  .lockup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+  }
+  .lockup-card {
+    background: var(--inset);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .lockup-stage {
+    background: var(--surface);
+    border-radius: 10px;
+    min-height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+  }
+  .wordmark {
+    font-size: 21px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .wordmark b { font-weight: 700; }
+  .lockup-card h3 {
+    font-size: 13.5px; margin: 0; display: flex; align-items: baseline; gap: 6px;
+  }
+  .lockup-card h3 .num {
+    font-size: 10.5px; color: var(--muted); font-weight: 700;
+    font-family: Menlo, Consolas, monospace;
+  }
+  .lockup-card p { font-size: 12px; color: var(--muted); margin: 0; }
+
+  footer {
+    margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>20 icon &amp; logo concepts</h1>
+  <p class="sub">Explorations against the shipped palette and rules in <span class="src">docs/design-rules.html</span> —
+  green family + one amber accent, no blue, gradients reserved for logo art only. The current shipped mark
+  (<span class="src">src/components/Logo.jsx</span>) is the aisle-with-pin design; everything below is a new
+  direction, not a replacement in progress.</p>
+
+  <h2>App icon concepts <span class="count">— 10, icon only</span></h2>
+  <p class="section-note">Square tile marks meant to survive at 40px on a home screen. No text — the shape has to carry it alone.</p>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <defs>
+            <linearGradient id="g1a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#229955"/><stop offset="1" stop-color="#157a40"/></linearGradient>
+            <linearGradient id="g1b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2ecc71"/><stop offset="1" stop-color="#1a9c4e"/></linearGradient>
+          </defs>
+          <path d="M8 54 L30 12 L34 12 L20 54 Z" fill="url(#g1a)"/>
+          <path d="M56 54 L34 12 L30 12 L44 54 Z" fill="url(#g1a)"/>
+          <rect x="21" y="32" width="22" height="7" rx="3" fill="url(#g1b)"/>
+          <circle cx="26" cy="29" r="2.6" fill="#ffc439"/>
+          <circle cx="32" cy="29" r="2.6" fill="#ffc439"/>
+          <circle cx="38" cy="29" r="2.6" fill="#ffc439"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">01</span> Shelf-A monogram</h3>
+      <p>An "A" built from two aisle-wall legs with a stocked shelf as the crossbar. Reuses the exact leg/shelf gradients already reserved in the design-rules doc but currently unused.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <path d="M10 16 L15 16 L22 42 L47 42 L53 21 L18 21" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="25" cy="50" r="4" fill="#ffffff"/>
+          <circle cx="43" cy="50" r="4" fill="#ffffff"/>
+          <path d="M22 30 L28 36 L41 22" fill="none" stroke="#ffc439" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">02</span> Cart + check</h3>
+      <p>A cart outline with a bold amber checkmark riding inside — reads instantly as "list, fulfilled," even at favicon size.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <rect x="16" y="14" width="32" height="40" rx="8" fill="#ffffff"/>
+          <circle cx="32" cy="22" r="3.2" fill="#1d5c40"/>
+          <path d="M23 38 L30 45 L43 28" fill="none" stroke="#175c3d" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">03</span> Aisle hang-tag</h3>
+      <p>The little punched-hole placard that hangs over a real aisle, with a checkmark standing in for the aisle number — signage, not a screen.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <path d="M32 6 C44 6 52 15 52 27 C52 40 32 58 32 58 C32 58 12 40 12 27 C12 15 20 6 32 6 Z" fill="#ffc439"/>
+          <path d="M20 22 Q32 28 44 22" fill="none" stroke="#1d5c40" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M20 30 Q32 36 44 30" fill="none" stroke="#1d5c40" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">04</span> Basket pin</h3>
+      <p>A map pin whose head is woven like a basket instead of holding a plain dot — location and grocery in one shape.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <rect x="10.25" y="34" width="3.5" height="16" rx="1.5" fill="#ffffff"/>
+          <rect x="16.25" y="28" width="3.5" height="22" rx="1.5" fill="#ffffff"/>
+          <rect x="22.25" y="20" width="3.5" height="30" rx="1.5" fill="#ffffff"/>
+          <rect x="28.25" y="14" width="4" height="36" rx="1.5" fill="#ffc439"/>
+          <rect x="34.25" y="20" width="3.5" height="30" rx="1.5" fill="#ffffff"/>
+          <rect x="40.25" y="28" width="3.5" height="22" rx="1.5" fill="#ffffff"/>
+          <rect x="46.25" y="34" width="3.5" height="16" rx="1.5" fill="#ffffff"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">05</span> Barcode peak</h3>
+      <p>A barcode whose bars rise to a single amber peak — "you are here," scanned. Ties the grocery-store material (barcodes) to wayfinding.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <rect x="18" y="12" width="28" height="38" rx="4" fill="#ffffff"/>
+          <rect x="26" y="8" width="12" height="6" rx="2" fill="#a3e9c2"/>
+          <circle cx="23" cy="23" r="2" fill="none" stroke="#175c3d" stroke-width="1.6"/>
+          <line x1="28" y1="23" x2="41" y2="23" stroke="#6e7c71" stroke-width="1.6"/>
+          <circle cx="23" cy="31" r="2" fill="none" stroke="#175c3d" stroke-width="1.6"/>
+          <line x1="28" y1="31" x2="41" y2="31" stroke="#6e7c71" stroke-width="1.6"/>
+          <circle cx="23" cy="39" r="2" fill="#ffc439"/>
+          <line x1="28" y1="39" x2="41" y2="39" stroke="#175c3d" stroke-width="1.6"/>
+          <path d="M32 51 C32 55 36 57 38 61" fill="none" stroke="#ffc439" stroke-width="2" stroke-linecap="round" stroke-dasharray="1.5 4.2"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">06</span> Checklist + route</h3>
+      <p>A clipboard mid-list — two items checked, one (amber) in progress — with a dotted route trailing off the bottom toward the next aisle.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <line x1="12" y1="20" x2="46" y2="20" stroke="#a3e9c2" stroke-width="2" opacity="0.55"/>
+          <line x1="12" y1="32" x2="46" y2="32" stroke="#a3e9c2" stroke-width="2" opacity="0.55"/>
+          <line x1="12" y1="44" x2="46" y2="44" stroke="#a3e9c2" stroke-width="2" opacity="0.55"/>
+          <circle cx="27" cy="27" r="12.5" fill="none" stroke="#ffffff" stroke-width="4"/>
+          <line x1="36" y1="36" x2="47" y2="47" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+          <rect x="22" y="30" width="7" height="7" rx="1.5" fill="#ffc439"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">07</span> Finder glass</h3>
+      <p>A magnifying glass over faint shelf lines, with one item spotlighted in amber — leans on the "Finder" half of the name.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="23" fill="none" stroke="#ffffff" stroke-width="2.6"/>
+          <line x1="32" y1="6" x2="32" y2="12" stroke="#ffffff" stroke-width="2.4"/>
+          <line x1="32" y1="52" x2="32" y2="58" stroke="#ffffff" stroke-width="2.4"/>
+          <line x1="6" y1="32" x2="12" y2="32" stroke="#ffffff" stroke-width="2.4"/>
+          <line x1="52" y1="32" x2="58" y2="32" stroke="#ffffff" stroke-width="2.4"/>
+          <path d="M32 12 L37 32 L32 30 L27 32 Z" fill="#ffc439"/>
+          <path d="M32 52 L27 32 L32 34 L37 32 Z" fill="#a3e9c2"/>
+          <circle cx="32" cy="32" r="3" fill="#ffffff"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">08</span> Cart compass</h3>
+      <p>A compass rose with a cart-colored needle — literal wayfinding, for a brand whose whole pitch is "the efficient path through the store."</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <path d="M16 28 L48 28 L42 46 L22 46 Z" fill="#ffffff" opacity="0.92"/>
+          <path d="M20 33 Q32 37 44 33" fill="none" stroke="#175c3d" stroke-width="1.8" opacity="0.6"/>
+          <path d="M21.5 39 Q32 43 42.5 39" fill="none" stroke="#175c3d" stroke-width="1.8" opacity="0.6"/>
+          <path d="M22 28 C22 16 42 16 42 28" fill="none" stroke="#ffc439" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 5.5"/>
+          <circle cx="32" cy="14" r="3" fill="#ffc439"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">09</span> Basket, dotted handle</h3>
+      <p>A woven basket whose handle is drawn as the dashed route line — the handle you carry and the path you walk are the same stroke.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <rect x="14" y="20" width="7" height="34" rx="3" fill="#ffffff"/>
+          <rect x="28" y="26" width="7" height="28" rx="3" fill="#a3e9c2"/>
+          <rect x="42" y="32" width="7" height="22" rx="3" fill="#ffffff" opacity="0.7"/>
+          <circle cx="17.5" cy="15" r="3.2" fill="#ffc439"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">10</span> Receding shelves (minimal)</h3>
+      <p>Three shelves in perspective, one item. The reduced-detail candidate — built to still read correctly at a 16px favicon.</p>
+    </div>
+
+  </div>
+
+  <h2>Logo lockup concepts <span class="count">— 10, icon + wordmark</span></h2>
+  <p class="section-note">Treatments for where the mark sits next to the "AisleFinder" wordmark: top bar, splash screen, share sheets, letterhead. Wordmark type is Arial, per the one-family rule — weight and spacing do the differentiating.</p>
+
+  <div class="lockup-grid">
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="icon-tile" style="width:44px;height:44px;border-radius:11px;">
+            <svg viewBox="0 0 64 64" style="width:28px;height:28px;">
+              <path d="M10 16 L15 16 L22 42 L47 42 L53 21 L18 21" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="25" cy="50" r="5" fill="#ffffff"/>
+              <circle cx="43" cy="50" r="5" fill="#ffffff"/>
+              <path d="M22 30 L28 37 L41 21" fill="none" stroke="#ffc439" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="wordmark"><b>Aisle</b>Finder</span>
+        </div>
+      </div>
+      <h3><span class="num">11</span> Nav-bar lockup</h3>
+      <p>Small tile, tight to the wordmark, same baseline — the direct swap-in for the current top-bar treatment.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div class="icon-tile" style="width:52px;height:52px;border-radius:13px;">
+            <svg viewBox="0 0 64 64" style="width:34px;height:34px;">
+              <path d="M8 54 L30 12 L34 12 L20 54 Z" fill="#2ecc71"/>
+              <path d="M56 54 L34 12 L30 12 L44 54 Z" fill="#1a9c4e"/>
+              <rect x="21" y="32" width="22" height="7" rx="3" fill="#a3e9c2"/>
+            </svg>
+          </div>
+          <span class="wordmark" style="font-size:15px; letter-spacing:2.5px; text-transform:uppercase; font-weight:700;">AisleFinder</span>
+        </div>
+      </div>
+      <h3><span class="num">12</span> Poster lockup</h3>
+      <p>Larger tile above a wide-tracked, all-caps wordmark — for a splash screen or store listing header, not the cramped top bar.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <span class="wordmark" style="font-size:26px;"><b>A</b><span style="position:relative;"><b style="visibility:hidden;">i</b><b style="position:absolute;left:0;">ı</b><span style="position:absolute; left:2.5px; top:-19px; width:6px; height:6px; border-radius:50%; background:#ffc439; display:inline-block;"></span></span><b>sle</b>Finder</span>
+      </div>
+      <h3><span class="num">13</span> Route-dot wordmark</h3>
+      <p>Pure typography — the dot over the "i" in Aisle becomes an amber route marker. No separate icon needed at all.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="text-align:center;">
+          <span class="wordmark" style="font-size:24px;"><b>Aisle</b>Finder</span>
+          <svg viewBox="0 0 120 14" style="width:130px;height:15px;display:block;margin:2px auto 0;">
+            <path d="M4 4 L96 4" fill="none" stroke="#ffc439" stroke-width="2" stroke-linecap="round" stroke-dasharray="1.5 5"/>
+            <path d="M96 1 C100 1 103 4 96 9 C100 4 96 1 96 1 Z" fill="#ffc439"/>
+          </svg>
+        </div>
+      </div>
+      <h3><span class="num">14</span> Route-underline wordmark</h3>
+      <p>A dashed amber path runs under the whole word and ends in a tiny pin drop past the last letter — the "trip," not just a dot.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:60px;height:60px;border-radius:50%;background:#1d5c40;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.18);">
+            <svg viewBox="0 0 64 64" style="width:36px;height:36px;">
+              <circle cx="27" cy="27" r="13" fill="none" stroke="#ffffff" stroke-width="4.5"/>
+              <line x1="37" y1="37" x2="49" y2="49" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+              <rect x="21.5" y="30.5" width="8" height="8" rx="1.5" fill="#ffc439"/>
+            </svg>
+          </div>
+          <span class="wordmark" style="font-size:12.5px; letter-spacing:1.5px; text-transform:uppercase;"><b>Aisle</b>Finder</span>
+        </div>
+      </div>
+      <h3><span class="num">15</span> Circular badge</h3>
+      <p>Round seal with the wordmark set small underneath — built for contexts that want a circle: app-store social preview, avatar, watch face.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="icon-tile" style="width:38px;height:76px;border-radius:10px;">
+            <svg viewBox="0 0 64 64" style="width:22px;height:22px;">
+              <path d="M16 28 L48 28 L42 46 L22 46 Z" fill="#ffffff"/>
+              <path d="M22 28 C22 16 42 16 42 28" fill="none" stroke="#ffc439" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="display:flex;flex-direction:column;line-height:1.15;">
+            <span style="font-size:19px;font-weight:700;color:var(--green-dark);">Aisle</span>
+            <span style="font-size:19px;color:var(--muted);">Finder</span>
+          </div>
+        </div>
+      </div>
+      <h3><span class="num">16</span> Stacked two-tone</h3>
+      <p>"Aisle" bold and dark, "Finder" lighter and muted, stacked beside a tall narrow chip — compact enough for a notification label or narrow rail.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="text-align:center;">
+          <span class="wordmark" style="font-size:24px;"><b>Aisle</b>Finder</span>
+          <svg viewBox="0 0 120 10" style="width:120px;height:9px;display:block;margin:3px auto 0;">
+            <rect x="8" y="0" width="104" height="2.4" rx="1.2" fill="#dfe8df"/>
+            <rect x="18" y="4.4" width="84" height="2.4" rx="1.2" fill="#dfe8df"/>
+            <rect x="30" y="8" width="60" height="2" rx="1" fill="#ffc439"/>
+          </svg>
+        </div>
+      </div>
+      <h3><span class="num">17</span> Shelf-baseline wordmark</h3>
+      <p>Three bars of decreasing width sit under the word like a shelf holding it up — the shelf motif moves into the typography itself.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <div class="icon-tile" style="width:64px;height:64px;border-radius:16px;">
+            <svg viewBox="0 0 64 64" style="width:40px;height:40px;">
+              <path d="M32 6 C44 6 52 15 52 27 C52 40 32 58 32 58 C32 58 12 40 12 27 C12 15 20 6 32 6 Z" fill="#ffc439"/>
+              <circle cx="32" cy="26" r="6" fill="#1d5c40"/>
+            </svg>
+          </div>
+          <span class="wordmark" style="font-size:17px; letter-spacing:1.2px;"><b>Aisle</b>Finder</span>
+        </div>
+      </div>
+      <h3><span class="num">18</span> Splash stack</h3>
+      <p>Icon centered on top, wordmark centered below with room to breathe — the about-screen and app-store-header version, not the cramped nav bar.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="background:#27ae60; border-radius:999px; padding:9px 18px 9px 10px; display:flex; align-items:center; gap:8px;">
+          <svg viewBox="0 0 64 64" style="width:20px;height:20px;">
+            <path d="M14 30 L26 42 L50 16" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span style="font-size:15px;font-weight:700;color:#ffffff;">AisleFinder</span>
+        </div>
+      </div>
+      <h3><span class="num">19</span> Pill lockup</h3>
+      <p>Everything inside one solid green capsule — sized for a floating action button, a watch complication, or a share-sheet chip.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <span class="wordmark" style="font-size:23px; color:var(--muted); font-weight:400;">Aisle<span style="color:#ffc439; font-weight:700;">Finder</span></span>
+      </div>
+      <h3><span class="num">20</span> Restrained editorial</h3>
+      <p>Wordmark drops to quiet ink almost everywhere, with only "Finder" carrying the single amber pop — for letterhead, print, or a signature line where the app-icon boldness would be too loud.</p>
+    </div>
+
+  </div>
+
+  <footer>
+    Rendered against the palette in <span class="src">docs/design-rules.html</span> (11-color core, no blue, gradients reserved for logo art). Tile backgrounds are fixed dark green regardless of theme, matching how the shipped logo behaves — everything else on this page follows the viewer's light/dark preference.
+  </footer>
+
+</div>
+</body>
+</html>

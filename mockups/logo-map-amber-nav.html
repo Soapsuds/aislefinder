@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AisleFinder — Store Map Mark, Amber Nav</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --card: #eff5fb;
+    --border: #d9e7f2;
+    --text: #1c2a3a;
+    --muted: #5f7183;
+    --navy: #1f5fa0;
+    --navy-deep: #153f6e;
+    --amber: #ffb52e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1420; --card: #141f2e; --border: #28405c;
+      --text: #e1e7ee; --muted: #8fa0b3;
+      --navy: #3f7fc4; --navy-deep: #96bee6; --amber: #d99a2b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1420; --card: #141f2e; --border: #28405c;
+    --text: #e1e7ee; --muted: #8fa0b3;
+    --navy: #3f7fc4; --navy-deep: #96bee6; --amber: #d99a2b;
+  }
+  :root[data-theme="light"] {
+    --bg: #ffffff; --card: #eff5fb; --border: #d9e7f2;
+    --text: #1c2a3a; --muted: #5f7183;
+    --navy: #1f5fa0; --navy-deep: #153f6e; --amber: #ffb52e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+    padding: 40px 20px 70px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.2px; }
+  .sub { color: var(--muted); font-size: 13.5px; margin: 0 0 6px; max-width: 660px; }
+  .src {
+    font-size: 11.5px; color: var(--muted); background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 1px 8px; font-family: Menlo, Consolas, monospace;
+  }
+  h2 {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px;
+    color: var(--muted); margin: 44px 0 4px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  p.section-note { font-size: 13px; color: var(--muted); margin: 0 0 18px; max-width: 720px; }
+
+  .hero {
+    display: flex; align-items: center; gap: 34px; flex-wrap: wrap;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 30px; margin-top: 22px;
+  }
+  .hero-copy { flex: 1; min-width: 260px; }
+  .hero-copy h2 { margin: 0 0 8px; border: none; padding: 0; font-size: 16px;
+    color: var(--text); text-transform: none; letter-spacing: 0; }
+  .hero-copy p { font-size: 13.5px; color: var(--muted); margin: 0 0 10px; }
+
+  .tile {
+    border-radius: 22%;
+    background: #153f6e;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(20,63,110,0.25), inset 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .tile.gold { background: #0d1420; box-shadow: 0 1px 3px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.06); }
+
+  .row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .card h3 { font-size: 13.5px; margin: 0; }
+  .card p { font-size: 12px; color: var(--muted); margin: 0; }
+  .stage {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    min-height: 96px; display: flex; align-items: center; justify-content: center;
+    gap: 18px; padding: 16px; flex-wrap: wrap;
+  }
+  .ramp { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+  .ramp figure { margin: 0; text-align: center; }
+  .ramp figcaption { font-size: 10.5px; color: var(--muted); margin-top: 6px;
+    font-family: Menlo, Consolas, monospace; }
+
+  .wordmark { font-size: 21px; color: var(--text); white-space: nowrap; }
+  .wordmark b { font-weight: 700; }
+
+  .swatches { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .sw { display: flex; align-items: center; gap: 6px; font-size: 11px;
+    color: var(--muted); font-family: Menlo, Consolas, monospace; }
+  .sw i { width: 20px; height: 20px; border-radius: 5px; display: inline-block;
+    border: 1px solid var(--border); }
+
+  footer {
+    margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Store map, top down — refined</h1>
+  <p class="sub">Concept 06 from the aisles-and-pins exploration, carried forward: now <b>four aisles</b>, recolored to
+  the <b>4N-e "Amber Nav"</b> scheme from <span class="src">mockups/color-schemes.html</span>. The route sweeps
+  diagonally across the store — in at the bottom-left, out at the pin in the top-right — reading as one confident
+  trip across the map.</p>
+  <div class="swatches">
+    <span class="sw"><i style="background:#153f6e"></i>#153f6e navy deep</span>
+    <span class="sw"><i style="background:#1f5fa0"></i>#1f5fa0 navy</span>
+    <span class="sw"><i style="background:#ffb52e"></i>#ffb52e amber (light)</span>
+    <span class="sw"><i style="background:#d99a2b"></i>#d99a2b gold (dark)</span>
+  </div>
+
+  <div class="hero">
+    <div class="tile" style="width:180px;height:180px;">
+      <svg viewBox="0 0 64 64" style="width:118px;height:118px;">
+        <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+        <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+        <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+        <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+        <path d="M6 58 C13 46 19 50 24 39 C29 28 35 32 40 21"
+              fill="none" stroke="#ffb52e" stroke-width="2.4" stroke-dasharray="2 5.4" stroke-linecap="round"/>
+        <path d="M44 7 c3.7 0 5.9 2.7 5.9 5.6 C49.9 17.4 44 22.3 44 22.3 S38.1 17.4 38.1 12.6 C38.1 9.7 40.3 7 44 7 Z" fill="#ffb52e"/>
+        <circle cx="44" cy="12.5" r="2" fill="#153f6e"/>
+      </svg>
+    </div>
+    <div class="hero-copy">
+      <h2>The mark</h2>
+      <p>Four aisle bars seen from above, alternating full and faded white so the store reads as rows with depth.
+      The dashed amber route enters at the bottom-left and curves gently up across the aisles to the pin at the
+      top-right — the whole trip in a single rising gesture.</p>
+      <p>Amber appears exactly twice — the route and the pin — matching Amber Nav's rule that amber marks
+      "where you're going" against an otherwise all-navy structure.</p>
+    </div>
+  </div>
+
+  <h2>Light and dark tiles</h2>
+  <p class="section-note">The light-scheme icon sits on deep navy with bright amber (#ffb52e). The dark-scheme variant follows the palette's guidance that pale amber washes out on dark grounds — the tile deepens to the dark body navy and the route/pin shift to gold (#d99a2b).</p>
+
+  <div class="row">
+    <div class="card" style="flex:1;min-width:280px;">
+      <div class="stage">
+        <div class="tile" style="width:112px;height:112px;">
+          <svg viewBox="0 0 64 64" style="width:72px;height:72px;">
+            <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+            <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+            <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+            <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+            <path d="M6 58 C13 46 19 50 24 39 C29 28 35 32 40 21"
+                  fill="none" stroke="#ffb52e" stroke-width="2.4" stroke-dasharray="2 5.4" stroke-linecap="round"/>
+            <path d="M44 7 c3.7 0 5.9 2.7 5.9 5.6 C49.9 17.4 44 22.3 44 22.3 S38.1 17.4 38.1 12.6 C38.1 9.7 40.3 7 44 7 Z" fill="#ffb52e"/>
+            <circle cx="44" cy="12.5" r="2" fill="#153f6e"/>
+          </svg>
+        </div>
+      </div>
+      <h3>Light scheme — navy deep #153f6e
++ amber #ffb52e</h3>
+      <p>Primary app icon. The tile navy matches the filled section headers in Amber Nav's light mode.</p>
+    </div>
+
+    <div class="card" style="flex:1;min-width:280px;">
+      <div class="stage">
+        <div class="tile gold" style="width:112px;height:112px;">
+          <svg viewBox="0 0 64 64" style="width:72px;height:72px;">
+            <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#96bee6" opacity="0.9"/>
+            <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#96bee6" opacity="0.5"/>
+            <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#96bee6" opacity="0.9"/>
+            <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#96bee6" opacity="0.5"/>
+            <path d="M6 58 C13 46 19 50 24 39 C29 28 35 32 40 21"
+                  fill="none" stroke="#d99a2b" stroke-width="2.4" stroke-dasharray="2 5.4" stroke-linecap="round"/>
+            <path d="M44 7 c3.7 0 5.9 2.7 5.9 5.6 C49.9 17.4 44 22.3 44 22.3 S38.1 17.4 38.1 12.6 C38.1 9.7 40.3 7 44 7 Z" fill="#d99a2b"/>
+            <circle cx="44" cy="12.5" r="2" fill="#0d1420"/>
+          </svg>
+        </div>
+      </div>
+      <h3>Dark scheme — body navy #0d1420 + gold #d99a2b</h3>
+      <p>For dark-mode contexts (tinted iOS icons, dark splash). Bars soften to the dark palette's pale navy #96bee6.</p>
+    </div>
+  </div>
+
+  <h2>Size ramp</h2>
+  <p class="section-note">The dashed route holds up to about 32px. Below that the smallest sizes swap to a simplified cut — same four bars, bigger pin, no route — so the favicon never turns to noise.</p>
+
+  <div class="card">
+    <div class="stage">
+      <div class="ramp">
+        <figure>
+          <div class="tile" style="width:96px;height:96px;">
+            <svg viewBox="0 0 64 64" style="width:62px;height:62px;">
+              <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <path d="M6 58 C13 46 19 50 24 39 C29 28 35 32 40 21"
+                    fill="none" stroke="#ffb52e" stroke-width="2.4" stroke-dasharray="2 5.4" stroke-linecap="round"/>
+              <path d="M44 7 c3.7 0 5.9 2.7 5.9 5.6 C49.9 17.4 44 22.3 44 22.3 S38.1 17.4 38.1 12.6 C38.1 9.7 40.3 7 44 7 Z" fill="#ffb52e"/>
+              <circle cx="44" cy="12.5" r="2" fill="#153f6e"/>
+            </svg>
+          </div>
+          <figcaption>96</figcaption>
+        </figure>
+        <figure>
+          <div class="tile" style="width:64px;height:64px;">
+            <svg viewBox="0 0 64 64" style="width:42px;height:42px;">
+              <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <path d="M6 58 C13 46 19 50 24 39 C29 28 35 32 40 21"
+                    fill="none" stroke="#ffb52e" stroke-width="2.4" stroke-dasharray="2 5.4" stroke-linecap="round"/>
+              <path d="M44 7 c3.7 0 5.9 2.7 5.9 5.6 C49.9 17.4 44 22.3 44 22.3 S38.1 17.4 38.1 12.6 C38.1 9.7 40.3 7 44 7 Z" fill="#ffb52e"/>
+              <circle cx="44" cy="12.5" r="2" fill="#153f6e"/>
+            </svg>
+          </div>
+          <figcaption>64</figcaption>
+        </figure>
+        <figure>
+          <div class="tile" style="width:44px;height:44px;">
+            <svg viewBox="0 0 64 64" style="width:29px;height:29px;">
+              <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <path d="M6 58 C13 46 19 50 24 39 C29 28 35 32 40 21"
+                    fill="none" stroke="#ffb52e" stroke-width="2.4" stroke-dasharray="2 5.4" stroke-linecap="round"/>
+              <path d="M44 7 c3.7 0 5.9 2.7 5.9 5.6 C49.9 17.4 44 22.3 44 22.3 S38.1 17.4 38.1 12.6 C38.1 9.7 40.3 7 44 7 Z" fill="#ffb52e"/>
+              <circle cx="44" cy="12.5" r="2" fill="#153f6e"/>
+            </svg>
+          </div>
+          <figcaption>44</figcaption>
+        </figure>
+        <figure>
+          <div class="tile" style="width:32px;height:32px;border-radius:8px;">
+            <svg viewBox="0 0 64 64" style="width:22px;height:22px;">
+              <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <path d="M44 4 c4.4 0 7 3.2 7 6.6 C51 16.6 44 22.5 44 22.5 S37 16.6 37 10.6 C37 7.2 39.6 4 44 4 Z" fill="#ffb52e"/>
+              <circle cx="44" cy="10.7" r="2.5" fill="#153f6e"/>
+            </svg>
+          </div>
+          <figcaption>32 · simplified</figcaption>
+        </figure>
+        <figure>
+          <div class="tile" style="width:20px;height:20px;border-radius:5px;">
+            <svg viewBox="0 0 64 64" style="width:14px;height:14px;">
+              <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <path d="M44 4 c4.4 0 7 3.2 7 6.6 C51 16.6 44 22.5 44 22.5 S37 16.6 37 10.6 C37 7.2 39.6 4 44 4 Z" fill="#ffb52e"/>
+              <circle cx="44" cy="10.7" r="2.5" fill="#153f6e"/>
+            </svg>
+          </div>
+          <figcaption>20 · simplified</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+
+  <h2>Lockups</h2>
+  <p class="section-note">Wordmark stays Arial per the one-family rule. "Aisle" takes the scheme navy, "Finder" the body text color — the same two-tone logic the app's bold/regular wordmark already uses.</p>
+
+  <div class="row">
+    <div class="card" style="flex:1;min-width:280px;">
+      <div class="stage">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="tile" style="width:44px;height:44px;border-radius:11px;">
+            <svg viewBox="0 0 64 64" style="width:29px;height:29px;">
+              <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <path d="M6 58 C13 46 19 50 24 39 C29 28 35 32 40 21"
+                    fill="none" stroke="#ffb52e" stroke-width="2.4" stroke-dasharray="2 5.4" stroke-linecap="round"/>
+              <path d="M44 7 c3.7 0 5.9 2.7 5.9 5.6 C49.9 17.4 44 22.3 44 22.3 S38.1 17.4 38.1 12.6 C38.1 9.7 40.3 7 44 7 Z" fill="#ffb52e"/>
+              <circle cx="44" cy="12.5" r="2" fill="#153f6e"/>
+            </svg>
+          </div>
+          <span class="wordmark"><b style="color:var(--navy);">Aisle</b>Finder</span>
+        </div>
+      </div>
+      <h3>Nav-bar lockup</h3>
+      <p>Tile tight against the wordmark at top-bar scale — the drop-in replacement arrangement.</p>
+    </div>
+
+    <div class="card" style="flex:1;min-width:280px;">
+      <div class="stage">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div class="tile" style="width:72px;height:72px;border-radius:18px;">
+            <svg viewBox="0 0 64 64" style="width:47px;height:47px;">
+              <rect x="8" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="21" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <rect x="34" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.95"/>
+              <rect x="47" y="14" width="7" height="40" rx="3.5" fill="#ffffff" opacity="0.62"/>
+              <path d="M6 58 C13 46 19 50 24 39 C29 28 35 32 40 21"
+                    fill="none" stroke="#ffb52e" stroke-width="2.4" stroke-dasharray="2 5.4" stroke-linecap="round"/>
+              <path d="M44 7 c3.7 0 5.9 2.7 5.9 5.6 C49.9 17.4 44 22.3 44 22.3 S38.1 17.4 38.1 12.6 C38.1 9.7 40.3 7 44 7 Z" fill="#ffb52e"/>
+              <circle cx="44" cy="12.5" r="2" fill="#153f6e"/>
+            </svg>
+          </div>
+          <span class="wordmark" style="font-size:15px; letter-spacing:2px; text-transform:uppercase; font-weight:700;"><span style="color:var(--navy);">Aisle</span>Finder</span>
+        </div>
+      </div>
+      <h3>Splash stack</h3>
+      <p>Centered icon over a wide-tracked caps wordmark for the launch screen and store listings.</p>
+    </div>
+  </div>
+
+  <footer>
+    Source concept: #06 in <span class="src">mockups/logo-icon-concepts-3.html</span>. Palette: 4N-e "Amber Nav"
+    (<span class="src">.t-ocean-e-light</span> / <span class="src">.t-ocean-e-dark</span> in
+    <span class="src">mockups/color-schemes.html</span>). This page itself renders in the Amber Nav neutrals and follows
+    your light/dark preference; the icon tiles are fixed, as app icons are.
+  </footer>
+
+</div>
+</body>
+</html>

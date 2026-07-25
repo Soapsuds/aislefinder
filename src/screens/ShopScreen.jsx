@@ -335,7 +335,7 @@ const ShopScreen = ({ list, updateList, completeList, outputFormat, setOutputFor
               spread: 160,
               startVelocity: 25,
               origin: { x: Math.random(), y: 0 },
-              colors: ['#27ae60', '#157a40', '#a3e9c2', '#ffc439'],
+              colors: ['#1f5fa0', '#153f6e', '#a8c8ea', '#ffb52e'],
             });
           }
           if (Date.now() < end) {
@@ -471,10 +471,6 @@ const ShopScreen = ({ list, updateList, completeList, outputFormat, setOutputFor
     }
   };
 
-  const finishShopping = () => {
-    setShowSummary(true);
-  };
-
   const completeShopping = () => {
     completeList(listId);
     onFinished();
@@ -494,8 +490,6 @@ const ShopScreen = ({ list, updateList, completeList, outputFormat, setOutputFor
       />
     );
   }
-
-  const allDone = totalItems > 0 && checkedCount === totalItems;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, position: 'relative' }}>
@@ -690,31 +684,6 @@ const ShopScreen = ({ list, updateList, completeList, outputFormat, setOutputFor
           </>
         )}
       </div>
-
-      {/* Finish footer */}
-      {!loading && !error && (
-        <div style={{
-          borderTop: '1px solid var(--af-border)',
-          padding: '12px 16px calc(14px + var(--safe-area-inset-bottom))',
-          background: 'var(--af-bg)',
-        }}>
-          <button
-            className="af-btn-green"
-            style={{
-              width: '100%',
-              justifyContent: 'center',
-              padding: '14px 24px',
-              fontSize: '15px',
-              borderRadius: '10px',
-              opacity: allDone ? 1 : 0.85,
-            }}
-            onClick={finishShopping}
-          >
-            <i className="fa-solid fa-flag-checkered" />
-            Finish
-          </button>
-        </div>
-      )}
 
       {/* Item help sheet — photo, description, and in-aisle location */}
       <ItemInfoSheet item={infoItem} store={list.store} onClose={() => setInfoItem(null)} />

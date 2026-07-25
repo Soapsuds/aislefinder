@@ -38,19 +38,16 @@ const ShopSummary = ({ totalItems, checkedCount, shopStartTime, hardestToFind, l
           <i className="fa-solid fa-check" style={{ color: 'white', fontSize: 26 }} />
         </div>
 
-        <h2 style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 700, color: 'var(--af-text)' }}>
+        <h2 style={{ margin: '0 0 10px', fontSize: 22, fontWeight: 700, color: 'var(--af-text)' }}>
           Shopping Complete!
         </h2>
-        <p style={{ margin: 0, fontSize: 13, color: 'var(--af-text-muted)' }}>
-          {allDone ? `All ${totalItems} items checked off` : `${checkedCount} of ${totalItems} items checked off`}
-        </p>
 
         {list.store && (
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: 5,
-            marginTop: 10,
+            marginBottom: 10,
             fontSize: 12,
             color: 'var(--af-text-muted)',
             backgroundColor: 'var(--af-surface)',
@@ -62,6 +59,10 @@ const ShopSummary = ({ totalItems, checkedCount, shopStartTime, hardestToFind, l
             {list.store.name}
           </div>
         )}
+
+        <p style={{ margin: 0, fontSize: 13, color: 'var(--af-text-muted)' }}>
+          {allDone ? `All ${totalItems} items checked off` : `${checkedCount} of ${totalItems} items checked off`}
+        </p>
 
         {mins !== null && (
           <div style={{ margin: '36px 0 0' }}>
@@ -97,8 +98,8 @@ const ShopSummary = ({ totalItems, checkedCount, shopStartTime, hardestToFind, l
             alignItems: 'center',
             gap: 12,
             textAlign: 'left',
-            backgroundColor: 'rgba(255,196,57,0.10)',
-            border: '1px solid rgba(255,196,57,0.30)',
+            backgroundColor: 'var(--af-amber-soft-bg)',
+            border: '1px solid var(--af-amber-soft-border)',
             borderRadius: 14,
             padding: '14px 16px',
           }}>
@@ -107,7 +108,7 @@ const ShopSummary = ({ totalItems, checkedCount, shopStartTime, hardestToFind, l
               height: 36,
               borderRadius: 10,
               flexShrink: 0,
-              backgroundColor: 'rgba(255,196,57,0.22)',
+              backgroundColor: 'var(--af-amber-soft-tile)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -126,7 +127,7 @@ const ShopSummary = ({ totalItems, checkedCount, shopStartTime, hardestToFind, l
                 Hardest to find
               </div>
               <div style={{ fontSize: 13, color: 'var(--af-text)' }}>
-                <strong>{hardestToFind.item}</strong> — you spent {hardestMinutes} minute{hardestMinutes === 1 ? '' : 's'} looking for this
+                It took you {hardestMinutes} minute{hardestMinutes === 1 ? '' : 's'} to find <strong>{hardestToFind.item}</strong>
               </div>
             </div>
           </div>

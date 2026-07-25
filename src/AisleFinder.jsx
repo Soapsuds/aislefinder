@@ -26,12 +26,12 @@ const AisleFinder = () => {
 
   useEffect(() => { saveState('outputFormat', outputFormat); }, [outputFormat]);
 
-  // Native status/gesture bar icon colors depend on which screen is up (green
-  // chrome vs. plain background) and the color scheme; Android also resets
-  // them on rotation and theme changes, so re-apply on those events.
+  // Native status/gesture bar icon colors follow the color scheme; Android
+  // also resets them on rotation and theme changes, so re-apply on those
+  // events too.
   useEffect(() => {
-    applySystemBars(screen);
-    const reapply = () => applySystemBars(screen);
+    applySystemBars();
+    const reapply = () => applySystemBars();
     const mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
     mq?.addEventListener('change', reapply);
     window.addEventListener('orientationchange', reapply);
@@ -95,10 +95,12 @@ const AisleFinder = () => {
     }}>
       {/* Global styles for theme, hover effects, animations, and mobile */}
       <style>{`
-        /* Theme palette ("Evergreen Chrome"). CORE COLORS ONLY — six neutrals,
-           one green pair, one chrome green, one amber, one error tone per
-           scheme. Everything below the "derived" line is an alias or an alpha
-           tint of a core color; add new colors to the core set only as a last
+        /* Theme palette ("Ocean Fresh — Amber Nav"). CORE COLORS ONLY — six
+           neutrals, one navy pair, one amber, one error tone per scheme.
+           There is no separate chrome color in this scheme — the top bar
+           sits flush on --af-bg, so --af-chrome* alias the body neutrals.
+           Everything below the "derived" line is an alias or an alpha tint
+           of a core color; add new colors to the core set only as a last
            resort. Dark values keep adjacent surfaces apart and text/background
            pairs at WCAG AA (4.5:1). */
         :root {
@@ -112,80 +114,85 @@ const AisleFinder = () => {
           --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
           --safe-area-inset-left: env(safe-area-inset-left, 0px);
           /* core neutrals */
-          --af-bg: #f6faf6;
-          --af-inset-bg: #ffffff;
-          --af-surface: #e9f0e9;
-          --af-border: #dfe8df;
-          --af-text: #22332a;
-          --af-text-muted: #6e7c71;
+          --af-bg: #ffffff;
+          --af-inset-bg: #eff5fb;
+          --af-surface: #e4edf6;
+          --af-border: #d9e7f2;
+          --af-text: #1c2a3a;
+          --af-text-muted: #5f7183;
           /* core accents */
-          --af-green: #27ae60;
-          --af-green-dark: #175c3d;
-          --af-chrome: #1d5c40;
-          --af-amber: #ffc439;
-          --af-amber-text: #7a4f00;
+          --af-green: #1f5fa0;
+          --af-green-dark: #153f6e;
+          --af-chrome: var(--af-bg);
+          --af-amber: #ffb52e;
+          --af-amber-text: #8a5f0e;
           --af-error-text: #b3541e;
           /* derived — aliases and tints of the core colors */
-          --af-chrome-text: #f2f8f2;
-          --af-chrome-muted: rgba(242, 248, 242, 0.65);
-          --af-chrome-border: rgba(255, 255, 255, 0.16);
+          --af-chrome-text: var(--af-text);
+          --af-chrome-muted: var(--af-text-muted);
+          --af-chrome-border: var(--af-border);
           --af-popup-bg: var(--af-inset-bg);
           --af-input-border: var(--af-border);
           --af-text-faint: var(--af-text-muted);
           --af-focus: var(--af-green);
-          --af-highlight-bg: rgba(39, 174, 96, 0.07);
-          --af-highlight-border: rgba(39, 174, 96, 0.35);
+          --af-highlight-bg: rgba(31, 95, 160, 0.07);
+          --af-highlight-border: rgba(31, 95, 160, 0.35);
           --af-error-bg: rgba(179, 84, 30, 0.08);
           --af-error-border: rgba(179, 84, 30, 0.35);
           --af-disabled-bg: var(--af-border);
           --af-disabled-text: var(--af-text-muted);
           --af-toast-bg: var(--af-text);
           --af-toast-text: var(--af-bg);
-          --af-celebrate-bg: rgba(39, 174, 96, 0.12);
+          --af-celebrate-bg: rgba(31, 95, 160, 0.12);
           --af-celebrate-text: var(--af-green-dark);
-          --af-green-soft: rgba(39, 174, 96, 0.15);
+          --af-green-soft: rgba(31, 95, 160, 0.15);
+          --af-amber-soft-bg: rgba(255, 181, 46, 0.10);
+          --af-amber-soft-border: rgba(255, 181, 46, 0.30);
+          --af-amber-soft-tile: rgba(255, 181, 46, 0.22);
           --af-btn-hover-bg: var(--af-green-dark);
-          --af-btn-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
-          --af-btn-shadow-hover: 0 4px 12px rgba(39, 174, 96, 0.4);
+          --af-btn-shadow: 0 2px 8px rgba(31, 95, 160, 0.3);
+          --af-btn-shadow-hover: 0 4px 12px rgba(31, 95, 160, 0.4);
           --af-backdrop: rgba(0, 0, 0, 0.2);
           --af-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
           --af-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
-          --af-logo-tile: #ffffff;
+          --af-logo-tile: var(--af-inset-bg);
         }
-        .af-logo-wall-l { fill: #1a9c4e; }
-        .af-logo-wall-r { fill: #157a40; }
+        .af-logo-aisle { fill: #1f5fa0; }
+        .af-logo-route { stroke: var(--af-amber); }
+        .af-logo-pin { fill: var(--af-amber); }
         @media (prefers-color-scheme: dark) {
           :root {
-            /* core neutrals — deep forest, not neutral black */
-            --af-bg: #131816;
-            --af-inset-bg: #1b2320;
-            --af-surface: #232c27;
-            --af-border: #33403a;
-            --af-text: #e6ebe6;
-            --af-text-muted: #9cab9f;
-            /* core accents — green desaturated so it doesn't glow on dark */
-            --af-green: #4cb782;
-            --af-green-dark: #9ecfb2;
-            --af-chrome: #16382a;
+            /* core neutrals — deep navy, not neutral black */
+            --af-bg: #0d1420;
+            --af-inset-bg: #141f2e;
+            --af-surface: #1a2636;
+            --af-border: #28405c;
+            --af-text: #e1e7ee;
+            --af-text-muted: #8fa0b3;
+            /* core accents — navy desaturated so it doesn't glow on dark */
+            --af-green: #3f7fc4;
+            --af-green-dark: #96bee6;
+            --af-amber: #d99a2b;
             --af-error-text: #ffab70;
             --af-amber-text: var(--af-amber);
-            --af-logo-tile: rgba(255, 255, 255, 0.08);
             /* derived */
             --af-popup-bg: var(--af-surface);
-            --af-highlight-bg: rgba(76, 183, 130, 0.12);
-            --af-highlight-border: rgba(76, 183, 130, 0.35);
+            --af-highlight-bg: rgba(63, 127, 196, 0.12);
+            --af-highlight-border: rgba(63, 127, 196, 0.35);
             --af-error-bg: rgba(255, 171, 112, 0.10);
             --af-error-border: rgba(255, 171, 112, 0.35);
-            --af-green-soft: rgba(76, 183, 130, 0.15);
-            --af-btn-hover-bg: #3da06f;
-            --af-btn-shadow: 0 2px 8px rgba(76, 183, 130, 0.25);
-            --af-btn-shadow-hover: 0 4px 12px rgba(76, 183, 130, 0.35);
+            --af-green-soft: rgba(63, 127, 196, 0.15);
+            --af-amber-soft-bg: rgba(217, 154, 43, 0.10);
+            --af-amber-soft-border: rgba(217, 154, 43, 0.30);
+            --af-amber-soft-tile: rgba(217, 154, 43, 0.22);
+            --af-btn-hover-bg: #2f68a8;
+            --af-btn-shadow: 0 2px 8px rgba(63, 127, 196, 0.25);
+            --af-btn-shadow-hover: 0 4px 12px rgba(63, 127, 196, 0.35);
             --af-backdrop: rgba(0, 0, 0, 0.55);
             --af-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
             --af-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.6);
           }
-          .af-logo-wall-l { fill: #2ecc71; }
-          .af-logo-wall-r { fill: #1a9c4e; }
+          .af-logo-aisle { fill: #96bee6; }
         }
         html, body {
           background-color: var(--af-bg);
@@ -383,18 +390,6 @@ const AisleFinder = () => {
         .af-chipbtn:hover {
           border-color: var(--af-focus);
           color: var(--af-focus);
-        }
-        /* Controls inside the green chrome (top bar) sit on --af-chrome,
-           so they use the white-alpha chrome tones instead of body tones */
-        .af-topbar .af-iconbtn,
-        .af-topbar .af-chipbtn {
-          border-color: var(--af-chrome-border);
-          color: var(--af-chrome-muted);
-        }
-        .af-topbar .af-iconbtn:hover,
-        .af-topbar .af-chipbtn:hover {
-          border-color: var(--af-chrome-text);
-          color: var(--af-chrome-text);
         }
         .af-backbtn {
           background: none;

@@ -70,38 +70,39 @@
 
   <!-- ================= THEME COLORS ================= -->
   <h2>Core palette <span class="src">src/AisleFinder.jsx — :root + prefers-color-scheme block</span></h2>
-  <p class="note">The scheme is <b>"Evergreen Chrome"</b>: a solid forest-green top bar in both modes over a calm,
-  green-tinted body. The palette is deliberately tiny: <b>six neutrals, one green pair, one chrome green, one amber,
-  one error tone</b> per scheme. No blues anywhere. Every other <code>--af-*</code> variable (highlight, error box,
-  disabled, toast, celebrate, popup, chrome text…) is an alias or an alpha tint of these — never a new hex.
-  Components reference variables only.</p>
+  <p class="note">The scheme is <b>"Ocean Fresh — Amber Nav"</b>: a flat white/navy body with no separate top-bar
+  chrome — the top bar sits flush on <code>--af-bg</code>, so <code>--af-chrome*</code> just alias the body
+  neutrals. The palette is deliberately tiny: <b>six neutrals, one navy pair, one amber, one error tone</b> per
+  scheme. Every other <code>--af-*</code> variable (highlight, error box, disabled, toast, celebrate, popup, chrome
+  text…) is an alias or an alpha tint of these — never a new hex. Components reference variables only.</p>
   <table>
-    <tr><th>Variable</th><th>Light</th><th></th><th class="darkcell" style="background:#131816;color:#9cab9f">Dark</th><th class="darkcell" style="background:#131816"></th><th>Used for</th></tr>
-    <tr><td><code>--af-bg</code></td><td>#f6faf6</td><td><span class="swatch" style="background:#f6faf6"></span></td><td class="darkcell">#131816</td><td class="darkcell"><span class="swatch on-dark" style="background:#131816"></span></td><td>App background (green-tinted, never pure white/black)</td></tr>
-    <tr><td><code>--af-inset-bg</code></td><td>#ffffff</td><td><span class="swatch" style="background:#ffffff"></span></td><td class="darkcell">#1b2320</td><td class="darkcell"><span class="swatch on-dark" style="background:#1b2320"></span></td><td>Cards and inputs (lighter than the page in both modes)</td></tr>
-    <tr><td><code>--af-surface</code></td><td>#e9f0e9</td><td><span class="swatch" style="background:#e9f0e9"></span></td><td class="darkcell">#232c27</td><td class="darkcell"><span class="swatch on-dark" style="background:#232c27"></span></td><td>Panels, group headers, hover rows, sheets (dark)</td></tr>
-    <tr><td><code>--af-border</code></td><td>#dfe8df</td><td><span class="swatch" style="background:#dfe8df"></span></td><td class="darkcell">#33403a</td><td class="darkcell"><span class="swatch on-dark" style="background:#33403a"></span></td><td>Dividers, input outlines, disabled fill</td></tr>
-    <tr><td><code>--af-text</code></td><td>#22332a</td><td><span class="swatch" style="background:#22332a"></span></td><td class="darkcell">#e6ebe6</td><td class="darkcell"><span class="swatch on-dark" style="background:#e6ebe6"></span></td><td>Primary text, toast background</td></tr>
-    <tr><td><code>--af-text-muted</code></td><td>#6e7c71</td><td><span class="swatch" style="background:#6e7c71"></span></td><td class="darkcell">#9cab9f</td><td class="darkcell"><span class="swatch on-dark" style="background:#9cab9f"></span></td><td>Secondary text, timestamps, icon buttons</td></tr>
-    <tr><td><code>--af-green</code></td><td>#27ae60</td><td><span class="swatch" style="background:#27ae60"></span></td><td class="darkcell">#4cb782</td><td class="darkcell"><span class="swatch on-dark" style="background:#4cb782"></span></td><td>Buttons, focus rings, links, badges, highlight tints (dark value is desaturated — never neon)</td></tr>
-    <tr><td><code>--af-green-dark</code></td><td>#175c3d</td><td><span class="swatch" style="background:#175c3d"></span></td><td class="darkcell">#9ecfb2</td><td class="darkcell"><span class="swatch on-dark" style="background:#9ecfb2"></span></td><td>Emphasis green (celebration text), button hover (light)</td></tr>
-    <tr><td><code>--af-chrome</code></td><td>#1d5c40</td><td><span class="swatch" style="background:#1d5c40"></span></td><td class="darkcell">#16382a</td><td class="darkcell"><span class="swatch on-dark" style="background:#16382a"></span></td><td>Top bar. Text/borders on it use derived <code>--af-chrome-text/muted/border</code> (white alphas)</td></tr>
-    <tr><td><code>--af-amber</code></td><td colspan="4" style="text-align:center">#ffc439 <span class="swatch" style="background:#ffc439"></span> (same in both schemes)</td><td>Other-member avatars, confetti, loading wheat</td></tr>
+    <tr><th>Variable</th><th>Light</th><th></th><th class="darkcell" style="background:#0d1420;color:#8fa0b3">Dark</th><th class="darkcell" style="background:#0d1420"></th><th>Used for</th></tr>
+    <tr><td><code>--af-bg</code></td><td>#ffffff</td><td><span class="swatch" style="background:#ffffff"></span></td><td class="darkcell">#0d1420</td><td class="darkcell"><span class="swatch on-dark" style="background:#0d1420"></span></td><td>App background, incl. top bar (flush, no separate chrome)</td></tr>
+    <tr><td><code>--af-inset-bg</code></td><td>#eff5fb</td><td><span class="swatch" style="background:#eff5fb"></span></td><td class="darkcell">#141f2e</td><td class="darkcell"><span class="swatch on-dark" style="background:#141f2e"></span></td><td>Cards and inputs (blue-tinted, distinct from the page)</td></tr>
+    <tr><td><code>--af-surface</code></td><td>#e4edf6</td><td><span class="swatch" style="background:#e4edf6"></span></td><td class="darkcell">#1a2636</td><td class="darkcell"><span class="swatch on-dark" style="background:#1a2636"></span></td><td>Panels, group headers, hover rows, sheets (dark)</td></tr>
+    <tr><td><code>--af-border</code></td><td>#d9e7f2</td><td><span class="swatch" style="background:#d9e7f2"></span></td><td class="darkcell">#28405c</td><td class="darkcell"><span class="swatch on-dark" style="background:#28405c"></span></td><td>Dividers, input outlines, disabled fill</td></tr>
+    <tr><td><code>--af-text</code></td><td>#1c2a3a</td><td><span class="swatch" style="background:#1c2a3a"></span></td><td class="darkcell">#e1e7ee</td><td class="darkcell"><span class="swatch on-dark" style="background:#e1e7ee"></span></td><td>Primary text, toast background</td></tr>
+    <tr><td><code>--af-text-muted</code></td><td>#5f7183</td><td><span class="swatch" style="background:#5f7183"></span></td><td class="darkcell">#8fa0b3</td><td class="darkcell"><span class="swatch on-dark" style="background:#8fa0b3"></span></td><td>Secondary text, timestamps, icon buttons</td></tr>
+    <tr><td><code>--af-green</code></td><td>#1f5fa0</td><td><span class="swatch" style="background:#1f5fa0"></span></td><td class="darkcell">#3f7fc4</td><td class="darkcell"><span class="swatch on-dark" style="background:#3f7fc4"></span></td><td>Buttons, focus rings, links, badges, highlight tints (dark value is desaturated — never neon). Var name kept for minimal diff — it's navy blue, not green.</td></tr>
+    <tr><td><code>--af-green-dark</code></td><td>#153f6e</td><td><span class="swatch" style="background:#153f6e"></span></td><td class="darkcell">#96bee6</td><td class="darkcell"><span class="swatch on-dark" style="background:#96bee6"></span></td><td>Emphasis navy (celebration text, wordmark), button hover (light)</td></tr>
+    <tr><td><code>--af-chrome</code></td><td colspan="4" style="text-align:center"><code>var(--af-bg)</code></td><td>Top bar background. No longer a distinct color — <code>--af-chrome-text/muted/border</code> alias <code>--af-text/-text-muted/-border</code> too</td></tr>
+    <tr><td><code>--af-amber</code></td><td>#ffb52e</td><td><span class="swatch" style="background:#ffb52e"></span></td><td class="darkcell">#d99a2b</td><td class="darkcell"><span class="swatch on-dark" style="background:#d99a2b"></span></td><td>Other-member avatars, confetti, loading wheat, star/favorite. Dark uses a deeper gold — pale amber washes out on dark backgrounds</td></tr>
     <tr><td><code>--af-error-text</code></td><td>#b3541e</td><td><span class="swatch" style="background:#b3541e"></span></td><td class="darkcell">#ffab70</td><td class="darkcell"><span class="swatch on-dark" style="background:#ffab70"></span></td><td>Errors, destructive hovers (boxes use alpha tints)</td></tr>
   </table>
 
   <!-- ================= CONSTANTS ================= -->
   <h2>Scheme-independent constants <span class="src">button classes in AisleFinder.jsx + Logo.jsx</span></h2>
-  <p class="note">Solid buttons take their green from the scheme (<code>var(--af-green)</code>) with white text in
-  both modes; hover uses <code>--af-btn-hover-bg</code> (#175c3d light / #3da06f dark). The logo art and confetti are
-  fixed in both schemes. No gradients in UI chrome — the logo is the only gradient in the app.</p>
+  <p class="note">Solid buttons take their navy from the scheme (<code>var(--af-green)</code>) with white text in
+  both modes; hover uses <code>--af-btn-hover-bg</code> (#153f6e light / #2f68a8 dark). The logo walls follow
+  <code>--af-green</code>-ish theme swatches via <code>.af-logo-wall-l/-r</code> (light/dark aware); the amber pin
+  and mint shelf accent are fixed in both schemes.</p>
   <table>
     <tr><th>Color</th><th></th><th>Where</th></tr>
-    <tr><td><code>#229955 → #157a40</code></td><td><span class="grad" style="background:linear-gradient(180deg,#229955,#157a40)"></span></td><td>Logo "A" legs</td></tr>
-    <tr><td><code>#2ecc71 → #1a9c4e</code></td><td><span class="grad" style="background:linear-gradient(135deg,#2ecc71,#1a9c4e)"></span></td><td>Logo crossbar shelf (logo art only)</td></tr>
-    <tr><td><code>#ffffff</code></td><td><span class="swatch" style="background:#ffffff"></span></td><td>Tile behind the logo in the top bar (keeps the green mark legible on the green chrome)</td></tr>
-    <tr><td><code>#27ae60 #157a40 #a3e9c2 #ffc439</code></td>
-        <td><span class="swatch" style="background:#27ae60"></span><span class="swatch" style="background:#157a40"></span><span class="swatch" style="background:#a3e9c2"></span><span class="swatch" style="background:#ffc439"></span></td>
+    <tr><td><code>#2f6fb0 / #1f5fa0</code></td><td><span class="swatch" style="background:#2f6fb0"></span><span class="swatch" style="background:#1f5fa0"></span></td><td>Logo walls, light mode (<code>.af-logo-wall-l/-r</code>)</td></tr>
+    <tr><td><code>#5a9bd8 / #3f7fc4</code></td><td><span class="swatch" style="background:#5a9bd8"></span><span class="swatch" style="background:#3f7fc4"></span></td><td>Logo walls, dark mode</td></tr>
+    <tr><td><code>var(--af-inset-bg)</code></td><td><span class="swatch" style="background:#eff5fb"></span></td><td>Tile behind the logo in the top bar (subtle chip on the flush <code>--af-bg</code> top bar)</td></tr>
+    <tr><td><code>#1f5fa0 #153f6e #a8c8ea #ffb52e</code></td>
+        <td><span class="swatch" style="background:#1f5fa0"></span><span class="swatch" style="background:#153f6e"></span><span class="swatch" style="background:#a8c8ea"></span><span class="swatch" style="background:#ffb52e"></span></td>
         <td>Confetti (shop-mode celebration)</td></tr>
   </table>
 
@@ -109,9 +110,9 @@
   <h2>Rules</h2>
   <ul class="rule-list">
     <li><b>Icons:</b> always Font Awesome (<code>&lt;i className="fa-solid fa-..."&gt;</code>), never emojis. Kit loaded in <span class="src">public/index.html</span>; prefer older icon names (<code>fa-cog</code> over <code>fa-gear</code>) if one doesn't render.</li>
-    <li><b>Logo:</b> the shelf-"A" monogram, all green (no blue in the mark). Art lives in <span class="src">src/components/Logo.jsx</span> and <span class="src">public/logo.svg</span> — keep them identical.</li>
-    <li><b>Colors:</b> component code references <code>var(--af-*)</code> only. The core set is 11 colors per scheme — before adding a hex, derive from an existing core color (alias or alpha tint) instead. No blues; no gradients outside the logo.</li>
-    <li><b>Chrome:</b> the top bar sits on <code>--af-chrome</code> (forest green) in both modes. Controls inside it use the <code>--af-chrome-*</code> white-alpha tones, scoped via the <code>.af-topbar</code> class — never the body tones.</li>
+    <li><b>Logo:</b> the shelf-"A" monogram, walls themed navy via <code>.af-logo-wall-l/-r</code>. Art lives in <span class="src">src/components/Logo.jsx</span> and <span class="src">public/logo.svg</span> — keep them identical.</li>
+    <li><b>Colors:</b> component code references <code>var(--af-*)</code> only. The core set is 10 colors per scheme — before adding a hex, derive from an existing core color (alias or alpha tint) instead. No gradients outside the logo.</li>
+    <li><b>Chrome:</b> there is no separate top-bar color in this scheme — <code>--af-chrome</code> sits flush on <code>--af-bg</code>, and <code>--af-chrome-text/muted/border</code> just alias the ordinary body tones, so controls inside <code>.af-topbar</code> need no scoped override.</li>
     <li><b>Font:</b> set once on the app shell; components inherit. No per-component font stacks.</li>
     <li><b>Buttons:</b> solid green = the "go shopping" happy path and primary actions, ghost/outline = secondary. Hover lifts 1–2px with a soft shadow.</li>
     <li><b>Radii:</b> 6px small controls, 8–10px buttons/inputs, 12px cards, 18px sheets, 999px chips.</li>

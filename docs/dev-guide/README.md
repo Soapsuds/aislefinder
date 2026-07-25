@@ -29,7 +29,7 @@ React (CRA) ──► Flask API ──► Kroger product API
 |---|---------|-------------------|
 | 4 | [React Frontend](04-react-frontend.md) | React fundamentals via real components from this codebase |
 | 5 | [Testing the React Frontend](05-testing-react.md) | Jest, jsdom, and behavior-level app tests |
-| 6 | [The Design System](06-design-system.md) | `--af-*` tokens, dark mode, and the green-only rules |
+| 6 | [The Design System](06-design-system.md) | `--af-*` tokens, dark mode, and the single-accent rules |
 
 **Shipping it**
 

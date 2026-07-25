@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AisleFinder — Aisles &amp; Pins: 20 Concepts</title>
+<style>
+  :root {
+    --bg: #f6faf6;
+    --inset: #ffffff;
+    --surface: #e9f0e9;
+    --border: #dfe8df;
+    --text: #22332a;
+    --muted: #6e7c71;
+    --green: #27ae60;
+    --green-dark: #175c3d;
+    --amber: #ffc439;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #131816; --inset: #1b2320; --surface: #232c27;
+      --border: #33403a; --text: #e6ebe6; --muted: #9cab9f;
+      --green: #4cb782; --green-dark: #9ecfb2;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #131816; --inset: #1b2320; --surface: #232c27;
+    --border: #33403a; --text: #e6ebe6; --muted: #9cab9f;
+    --green: #4cb782; --green-dark: #9ecfb2;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6faf6; --inset: #ffffff; --surface: #e9f0e9;
+    --border: #dfe8df; --text: #22332a; --muted: #6e7c71;
+    --green: #27ae60; --green-dark: #175c3d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+    padding: 40px 20px 70px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.2px; }
+  .sub { color: var(--muted); font-size: 13.5px; margin: 0 0 6px; max-width: 660px; }
+  .src {
+    font-size: 11.5px; color: var(--muted); background: var(--surface);
+    border-radius: 6px; padding: 2px 8px; font-family: Menlo, Consolas, monospace;
+  }
+  h2 {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px;
+    color: var(--muted); margin: 46px 0 4px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2 span.count { color: var(--text); }
+  p.section-note { font-size: 13px; color: var(--muted); margin: 0 0 18px; max-width: 720px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--inset);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card .tile-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 108px;
+  }
+  .icon-tile {
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+    background: #1d5c40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .icon-tile svg { width: 60px; height: 60px; }
+  .card h3 {
+    font-size: 13.5px; margin: 0; display: flex; align-items: baseline; gap: 6px;
+  }
+  .card h3 .num {
+    font-size: 10.5px; color: var(--muted); font-weight: 700;
+    font-family: Menlo, Consolas, monospace;
+  }
+  .card p { font-size: 12px; color: var(--muted); margin: 0; }
+
+  .lockup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+  }
+  .lockup-card {
+    background: var(--inset);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .lockup-stage {
+    background: var(--surface);
+    border-radius: 10px;
+    min-height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+  }
+  .wordmark { font-size: 21px; color: var(--text); white-space: nowrap; }
+  .wordmark b { font-weight: 700; }
+  .lockup-card h3 {
+    font-size: 13.5px; margin: 0; display: flex; align-items: baseline; gap: 6px;
+  }
+  .lockup-card h3 .num {
+    font-size: 10.5px; color: var(--muted); font-weight: 700;
+    font-family: Menlo, Consolas, monospace;
+  }
+  .lockup-card p { font-size: 12px; color: var(--muted); margin: 0; }
+
+  footer {
+    margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Aisles &amp; pins — 20 concepts</h1>
+  <p class="sub">Every concept on this page works the same two ingredients: <b>a corridor receding to a vanishing
+  point</b> and <b>an amber location pin</b>. These are variations on the DNA of the shipped mark in
+  <span class="src">src/components/Logo.jsx</span>, pushed in different directions — perspective depth, top-down maps,
+  pure reduction. Palette per <span class="src">docs/design-rules.html</span>: greens + one amber, no blue.</p>
+
+  <h2>App icon concepts <span class="count">— 12, icon only</span></h2>
+  <p class="section-note">Fixed dark-green tile (matching the top-bar chrome), white/mint structure, amber always and only for the pin or destination.</p>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <defs>
+            <linearGradient id="wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2ecc71"/><stop offset="1" stop-color="#1a9c4e"/></linearGradient>
+            <linearGradient id="wr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a9c4e"/><stop offset="1" stop-color="#157a40"/></linearGradient>
+          </defs>
+          <path d="M8 58 L30 22 L33 22 L18 58 Z" fill="url(#wl)"/>
+          <path d="M56 58 L34 22 L31 22 L46 58 Z" fill="url(#wr)"/>
+          <path d="M32 4 c4 0 6.4 2.9 6.4 6.1 C38.4 15.4 32 20 32 20 S25.6 15.4 25.6 10.1 C25.6 6.9 28 4 32 4 Z" fill="#ffc439"/>
+          <circle cx="32" cy="9.8" r="2.3" fill="#fff"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">01</span> Pin at the vanishing point</h3>
+      <p>Two aisle walls converge and the pin sits exactly where they meet — the destination literally is the point of the perspective.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <line x1="10" y1="58" x2="30" y2="16" stroke="#aaf0ce" stroke-width="2" opacity="0.7"/>
+          <line x1="54" y1="58" x2="34" y2="16" stroke="#aaf0ce" stroke-width="2" opacity="0.7"/>
+          <line x1="13" y1="52" x2="51" y2="52" stroke="#aaf0ce" stroke-width="2" opacity="0.35"/>
+          <line x1="18" y1="42" x2="46" y2="42" stroke="#aaf0ce" stroke-width="1.8" opacity="0.35"/>
+          <line x1="22" y1="34" x2="42" y2="34" stroke="#aaf0ce" stroke-width="1.6" opacity="0.35"/>
+          <line x1="25" y1="28" x2="39" y2="28" stroke="#aaf0ce" stroke-width="1.4" opacity="0.35"/>
+          <path d="M32 12 c3.4 0 5.4 2.4 5.4 5.1 C37.4 21.5 32 25.5 32 25.5 S26.6 21.5 26.6 17.1 C26.6 14.4 28.6 12 32 12 Z" fill="#ffc439"/>
+          <circle cx="32" cy="16.9" r="1.9" fill="#1d5c40"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">02</span> Floor grid</h3>
+      <p>The supermarket floor drawn as a perspective grid, tiles compressing toward the back, with the pin standing mid-aisle where your item is.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <rect x="8" y="8" width="48" height="48" rx="7" fill="none" stroke="#ffffff" stroke-width="2.6"/>
+          <rect x="17" y="17" width="30" height="30" rx="5" fill="none" stroke="#aaf0ce" stroke-width="2.2" opacity="0.75"/>
+          <rect x="24.5" y="24.5" width="15" height="15" rx="3.5" fill="none" stroke="#aaf0ce" stroke-width="1.8" opacity="0.45"/>
+          <circle cx="32" cy="32" r="4.5" fill="#ffc439"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">03</span> Nested doorways</h3>
+      <p>Walking down the aisle as nested frames shrinking to the center — depth without any diagonal lines. The amber dot is the far end of the trip.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <path d="M32 4 C45 4 53 13.5 53 26 C53 40 32 60 32 60 C32 60 11 40 11 26 C11 13.5 19 4 32 4 Z" fill="#ffffff"/>
+          <path d="M22 40 L30 17 L32.4 17 L26.5 40 Z" fill="#175c3d"/>
+          <path d="M42 40 L34 17 L31.6 17 L37.5 40 Z" fill="#1a9c4e"/>
+          <circle cx="32" cy="13" r="2.6" fill="#ffc439"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">04</span> Aisle inside the pin</h3>
+      <p>Inversion of 01: the pin is the container and the receding aisle lives inside its head. Strong silhouette for small sizes.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <rect x="10" y="14" width="17" height="12" rx="2.5" fill="#ffffff"/>
+          <rect x="31" y="17.5" width="11.5" height="8" rx="2" fill="#aaf0ce" opacity="0.8"/>
+          <rect x="45.5" y="19.5" width="7.5" height="5.5" rx="1.5" fill="#aaf0ce" opacity="0.45"/>
+          <line x1="18.5" y1="8" x2="18.5" y2="14" stroke="#ffffff" stroke-width="1.8"/>
+          <line x1="36.75" y1="11" x2="36.75" y2="17.5" stroke="#aaf0ce" stroke-width="1.5" opacity="0.8"/>
+          <line x1="49.25" y1="13.5" x2="49.25" y2="19.5" stroke="#aaf0ce" stroke-width="1.2" opacity="0.45"/>
+          <path d="M18.5 34 c3.6 0 5.8 2.6 5.8 5.5 C24.3 44.2 18.5 49 18.5 49 S12.7 44.2 12.7 39.5 C12.7 36.6 14.9 34 18.5 34 Z" fill="#ffc439"/>
+          <circle cx="18.5" cy="39.3" r="2" fill="#1d5c40"/>
+          <path d="M24 52 C32 50 42 44 50 32" fill="none" stroke="#ffc439" stroke-width="2.2" stroke-dasharray="1.8 5" stroke-linecap="round"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">05</span> Hanging aisle signs</h3>
+      <p>The overhead aisle placards receding down the corridor — the most literal "grocery store" image on the page — with the pin dropped under the nearest one.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <rect x="12" y="10" width="8" height="44" rx="4" fill="#ffffff" opacity="0.9"/>
+          <rect x="28" y="10" width="8" height="44" rx="4" fill="#ffffff" opacity="0.55"/>
+          <rect x="44" y="10" width="8" height="44" rx="4" fill="#ffffff" opacity="0.9"/>
+          <path d="M6 58 C14 46 20 50 24 38 C28 26 36 32 39 20" fill="none" stroke="#ffc439" stroke-width="2.4" stroke-dasharray="2 5.5" stroke-linecap="round"/>
+          <path d="M40 4 c3.6 0 5.8 2.6 5.8 5.5 C45.8 14.2 40 19 40 19 S34.2 14.2 34.2 9.5 C34.2 6.6 36.4 4 40 4 Z" fill="#ffc439"/>
+          <circle cx="40" cy="9.3" r="2" fill="#1d5c40"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">06</span> Store map, top down</h3>
+      <p>Aisles seen from above as three bars, with the dashed route snaking through the gaps to the pin. The planner's view instead of the shopper's.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <path d="M10 56 L29 10 L35 10 L54 56 L45 56 L33 22 L31 22 L19 56 Z" fill="#ffffff"/>
+          <path d="M32 30 c3.8 0 6 2.7 6 5.7 C38 40.6 32 45.5 32 45.5 S26 40.6 26 35.7 C26 32.7 28.2 30 32 30 Z" fill="#ffc439"/>
+          <circle cx="32" cy="35.5" r="2.1" fill="#1d5c40"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">07</span> A with a pin heart</h3>
+      <p>The letter A as two receding aisle walls, its counter filled by the pin instead of a crossbar. Monogram, aisle, and destination in one glyph.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <rect x="15" y="8" width="34" height="4.5" rx="2.2" fill="#ffffff"/>
+          <rect x="20" y="18" width="24" height="4" rx="2" fill="#ffffff" opacity="0.7"/>
+          <rect x="24" y="27" width="16" height="3.5" rx="1.7" fill="#ffffff" opacity="0.45"/>
+          <rect x="27" y="35" width="10" height="3" rx="1.5" fill="#ffffff" opacity="0.28"/>
+          <path d="M32 42 c3.8 0 6 2.7 6 5.7 C38 52.6 32 58 32 58 S26 52.6 26 47.7 C26 44.7 28.2 42 32 42 Z" fill="#ffc439"/>
+          <circle cx="32" cy="47.5" r="2.1" fill="#1d5c40"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">08</span> Ceiling lights</h3>
+      <p>The fluorescent strips overhead, shrinking and fading with distance, funneling the eye straight down to the pin at the end of the run.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <path d="M28 30 L58 48 L58 58 L24 36 Z" fill="#0f3a28"/>
+          <path d="M24 6 c4.2 0 6.8 3 6.8 6.4 C30.8 18 24 23.5 24 23.5 S17.2 18 17.2 12.4 C17.2 9 19.8 6 24 6 Z" fill="#ffc439"/>
+          <circle cx="24" cy="12.2" r="2.4" fill="#1d5c40"/>
+          <line x1="24" y1="23.5" x2="24" y2="34" stroke="#ffc439" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">09</span> Long-shadow pin</h3>
+      <p>The pin casts a shadow that widens away from it like an aisle in reverse perspective — the recede happens on the floor, not the walls.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <line x1="12" y1="58" x2="29" y2="20" stroke="#aaf0ce" stroke-width="2.2" opacity="0.5"/>
+          <line x1="56" y1="58" x2="37" y2="20" stroke="#aaf0ce" stroke-width="2.2" opacity="0.5"/>
+          <path d="M18 58 C26 46 26 38 32 30 C37 23 41 20 45 16" fill="none" stroke="#ffc439" stroke-width="2.6" stroke-dasharray="2 6" stroke-linecap="round"/>
+          <path d="M47 2 c3.8 0 6 2.7 6 5.7 C53 12.6 47 17.5 47 17.5 S41 12.6 41 7.7 C41 4.7 43.2 2 47 2 Z" fill="#ffc439"/>
+          <circle cx="47" cy="7.5" r="2.1" fill="#fff"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">10</span> Route through the corridor</h3>
+      <p>The walls fade to thin guides and the dashed route becomes the hero, curving up the aisle to the pin. Closest evolution of the shipped mark.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <rect x="8" y="18" width="4" height="40" rx="2" fill="#ffffff"/>
+          <rect x="15" y="24" width="4" height="34" rx="2" fill="#ffffff" opacity="0.8"/>
+          <rect x="22" y="30" width="4" height="28" rx="2" fill="#ffffff" opacity="0.6"/>
+          <rect x="38" y="30" width="4" height="28" rx="2" fill="#ffffff" opacity="0.6"/>
+          <rect x="45" y="24" width="4" height="34" rx="2" fill="#ffffff" opacity="0.8"/>
+          <rect x="52" y="18" width="4" height="40" rx="2" fill="#ffffff"/>
+          <path d="M32 24 c3.8 0 6 2.7 6 5.7 C38 34.6 32 39.5 32 39.5 S26 34.6 26 29.7 C26 26.7 28.2 24 32 24 Z" fill="#ffc439"/>
+          <circle cx="32" cy="29.5" r="2.1" fill="#1d5c40"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">11</span> Barcode aisle</h3>
+      <p>Shelf uprights read as barcode bars, stepping down toward a central gap where the pin waits — the aisle opening drawn in the store's own material.</p>
+    </div>
+
+    <div class="card">
+      <div class="tile-row"><div class="icon-tile">
+        <svg viewBox="0 0 64 64">
+          <path d="M14 54 L29 17" fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+          <path d="M50 54 L35 17" fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+          <circle cx="32" cy="9.5" r="5.5" fill="#ffc439"/>
+        </svg>
+      </div></div>
+      <h3><span class="num">12</span> The reduction</h3>
+      <p>Two strokes and a dot: the whole idea at its smallest. This is the version that survives a 16px favicon and a monochrome watch face.</p>
+    </div>
+
+  </div>
+
+  <h2>Logo lockup concepts <span class="count">— 8, with wordmark</span></h2>
+  <p class="section-note">Wordmark stays Arial per the one-family rule; the aisle-and-pin motif carries into the type in different ways.</p>
+
+  <div class="lockup-grid">
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="icon-tile" style="width:44px;height:44px;border-radius:11px;">
+            <svg viewBox="0 0 64 64" style="width:28px;height:28px;">
+              <path d="M8 58 L30 22 L33 22 L18 58 Z" fill="#2ecc71"/>
+              <path d="M56 58 L34 22 L31 22 L46 58 Z" fill="#1a9c4e"/>
+              <path d="M32 4 c4 0 6.4 2.9 6.4 6.1 C38.4 15.4 32 20 32 20 S25.6 15.4 25.6 10.1 C25.6 6.9 28 4 32 4 Z" fill="#ffc439"/>
+              <circle cx="32" cy="9.8" r="2.3" fill="#fff"/>
+            </svg>
+          </div>
+          <span class="wordmark"><b>Aisle</b>Finder</span>
+        </div>
+      </div>
+      <h3><span class="num">13</span> Nav-bar lockup</h3>
+      <p>Concept 01 in the standard top-bar arrangement — the drop-in replacement test for the current logo.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;align-items:baseline;">
+          <svg viewBox="0 0 64 64" style="width:30px;height:30px;align-self:center;margin-right:1px;">
+            <path d="M10 56 L29 10 L35 10 L54 56 L45 56 L33 22 L31 22 L19 56 Z" fill="var(--text)"/>
+            <path d="M32 30 c3.8 0 6 2.7 6 5.7 C38 40.6 32 45.5 32 45.5 S26 40.6 26 35.7 C26 32.7 28.2 30 32 30 Z" fill="#ffc439"/>
+          </svg>
+          <span class="wordmark" style="font-size:23px;"><b>isle</b>Finder</span>
+        </div>
+      </div>
+      <h3><span class="num">14</span> The A is the mark</h3>
+      <p>Concept 07 replaces the capital A, so the wordmark and icon are one continuous object — no separate tile needed.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="text-align:center;">
+          <span class="wordmark" style="font-size:24px;"><b>A</b><span style="position:relative;"><b style="visibility:hidden;">i</b><b style="position:absolute;left:0;">ı</b><svg viewBox="0 0 12 16" style="position:absolute;left:0.5px;top:-16px;width:10px;height:13px;"><path d="M6 1 c3 0 4.8 2.1 4.8 4.5 C10.8 9.6 6 13.5 6 13.5 S1.2 9.6 1.2 5.5 C1.2 3.1 3 1 6 1 Z" fill="#ffc439"/><circle cx="6" cy="5.4" r="1.6" fill="var(--surface)"/></svg></span><b>sle</b>Finder</span>
+          <svg viewBox="0 0 140 12" style="width:140px;height:12px;display:block;margin:2px auto 0;">
+            <line x1="4" y1="10" x2="128" y2="3" stroke="var(--border)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="4" y1="4" x2="128" y2="8.5" stroke="var(--border)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="132" cy="5.8" r="3" fill="#ffc439"/>
+          </svg>
+        </div>
+      </div>
+      <h3><span class="num">15</span> Pin-dotted i, converging rule</h3>
+      <p>The i's dot becomes a pin, and two hairlines converge under the word to a point past "Finder" — the recede rendered typographically.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div class="icon-tile" style="width:64px;height:64px;border-radius:16px;">
+            <svg viewBox="0 0 64 64" style="width:40px;height:40px;">
+              <path d="M32 4 C45 4 53 13.5 53 26 C53 40 32 60 32 60 C32 60 11 40 11 26 C11 13.5 19 4 32 4 Z" fill="#ffffff"/>
+              <path d="M22 40 L30 17 L32.4 17 L26.5 40 Z" fill="#175c3d"/>
+              <path d="M42 40 L34 17 L31.6 17 L37.5 40 Z" fill="#1a9c4e"/>
+              <circle cx="32" cy="13" r="2.6" fill="#ffc439"/>
+            </svg>
+          </div>
+          <span class="wordmark" style="font-size:16px; letter-spacing:2px; text-transform:uppercase; font-weight:700;">AisleFinder</span>
+        </div>
+      </div>
+      <h3><span class="num">16</span> Splash stack</h3>
+      <p>Concept 04 centered over a wide-tracked caps wordmark — the launch-screen and store-listing arrangement.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:7px;">
+          <div style="width:62px;height:62px;border-radius:50%;background:#1d5c40;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.18);">
+            <svg viewBox="0 0 64 64" style="width:38px;height:38px;">
+              <line x1="14" y1="54" x2="29" y2="18" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+              <line x1="50" y1="54" x2="35" y2="18" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="32" cy="11" r="5" fill="#ffc439"/>
+            </svg>
+          </div>
+          <span class="wordmark" style="font-size:12.5px; letter-spacing:1.5px; text-transform:uppercase;"><b>Aisle</b>Finder</span>
+        </div>
+      </div>
+      <h3><span class="num">17</span> Circular badge</h3>
+      <p>The reduction (concept 12) in a round seal with the name set small below — avatar, social preview, sticker.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;align-items:center;gap:11px;">
+          <div class="icon-tile" style="width:40px;height:78px;border-radius:11px;">
+            <svg viewBox="0 0 64 110" style="width:24px;height:44px;">
+              <path d="M32 4 c5 0 8 3.6 8 7.6 C40 18.3 32 24 32 24 S24 18.3 24 11.6 C24 7.6 27 4 32 4 Z" fill="#ffc439"/>
+              <line x1="18" y1="102" x2="29" y2="34" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+              <line x1="46" y1="102" x2="35" y2="34" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="display:flex;flex-direction:column;line-height:1.15;">
+            <span style="font-size:19px;font-weight:700;color:var(--green-dark);">Aisle</span>
+            <span style="font-size:19px;color:var(--muted);">Finder</span>
+          </div>
+        </div>
+      </div>
+      <h3><span class="num">18</span> Tall corridor chip</h3>
+      <p>A portrait tile stretches the corridor vertically — pin high, walls running the full height — beside a stacked two-tone wordmark.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="background:#27ae60; border-radius:999px; padding:9px 18px 9px 12px; display:flex; align-items:center; gap:8px;">
+          <svg viewBox="0 0 64 64" style="width:19px;height:19px;">
+            <line x1="14" y1="56" x2="29" y2="22" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+            <line x1="50" y1="56" x2="35" y2="22" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="32" cy="12" r="6" fill="#ffc439"/>
+          </svg>
+          <span style="font-size:15px;font-weight:700;color:#ffffff;">AisleFinder</span>
+        </div>
+      </div>
+      <h3><span class="num">19</span> Pill lockup</h3>
+      <p>The reduction plus the name in one solid green capsule — floating button, share chip, watch complication.</p>
+    </div>
+
+    <div class="lockup-card">
+      <div class="lockup-stage">
+        <div style="display:flex;align-items:center;">
+          <span class="wordmark" style="font-size:22px; color:var(--muted); font-weight:400;">Aisle<b style="color:var(--text);">Finder</b></span>
+          <svg viewBox="0 0 74 26" style="width:74px;height:26px;margin-left:6px;">
+            <path d="M2 22 C18 20 34 16 50 8" fill="none" stroke="#ffc439" stroke-width="2.2" stroke-dasharray="1.8 5.2" stroke-linecap="round"/>
+            <path d="M56 1 c2.9 0 4.7 2.1 4.7 4.4 C60.7 9.4 56 13.2 56 13.2 S51.3 9.4 51.3 5.4 C51.3 3.1 53.1 1 56 1 Z" fill="#ffc439"/>
+            <circle cx="56" cy="5.3" r="1.6" fill="var(--surface)"/>
+          </svg>
+        </div>
+      </div>
+      <h3><span class="num">20</span> Trailing route</h3>
+      <p>Quiet editorial wordmark with the dashed route leaving the last letter and landing on a pin — the trip continues past the name.</p>
+    </div>
+
+  </div>
+
+  <footer>
+    Companion to the earlier broad exploration (<span class="src">mockups/logo-icon-concepts-2.html</span>) — this page
+    narrows to the receding-aisle + pin motif. Tile backgrounds stay fixed dark green in both themes, matching the
+    shipped logo's behavior; the page itself follows the viewer's light/dark preference.
+  </footer>
+
+</div>
+</body>
+</html>

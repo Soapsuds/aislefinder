@@ -25,8 +25,8 @@ const TopBar = ({ user, onShowHistory, onShowLists, onShowAccount }) => (
         <Logo size={20} />
       </span>
       <span>
-        <span style={{ fontWeight: 700, color: '#aaf0ce' }}>Aisle</span>
-        <span style={{ fontWeight: 400, color: 'rgba(170, 240, 206, 0.6)' }}>Finder</span>
+        <span style={{ fontWeight: 700, color: 'var(--af-green-dark)' }}>Aisle</span>
+        <span style={{ fontWeight: 400, color: 'var(--af-text-muted)' }}>Finder</span>
       </span>
     </div>
     <div style={{ flex: 1 }} />
@@ -43,8 +43,8 @@ const TopBar = ({ user, onShowHistory, onShowLists, onShowAccount }) => (
         borderRadius: '50%',
         background: user
           ? 'var(--af-green)'
-          : 'rgba(255, 255, 255, 0.28)',
-        color: 'white',
+          : 'var(--af-border)',
+        color: user ? 'white' : 'var(--af-text-muted)',
         fontSize: '11px',
         fontWeight: 700,
         display: 'inline-flex',

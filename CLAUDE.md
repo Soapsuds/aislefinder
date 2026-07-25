@@ -76,4 +76,4 @@ The default store is Kroger `01400943` ("4500S Smiths"), defined in `grocery_rou
 ## Development Notes
 
 - After web changes that should ship to mobile: `npm run ios:build` / `npm run android:build` (Capacitor sync)
-- UI rules: Font Awesome icons only (no emojis), `fa-cog` not `fa-gear`; all colors via `--af-*` CSS variables (green-only palette + amber accent); font set once on the shell — see `docs/design-rules.html`
+- UI rules: Font Awesome icons only (no emojis), `fa-cog` not `fa-gear`; all colors via `--af-*` CSS variables (navy palette + amber accent, "Ocean Fresh — Amber Nav"; the top bar has no separate chrome color — it's flush on `--af-bg`); font set once on the shell — see `docs/design-rules.html`

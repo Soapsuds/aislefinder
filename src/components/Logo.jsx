@@ -1,16 +1,19 @@
 import React from 'react';
 
-// AisleFinder logo: perspective aisle with a dashed route curving to an amber pin
-// on the right wall, and a single mint shelf on the right wall.
+// AisleFinder logo: top-down store map — four aisle bars (alternating full/faded)
+// with a dashed route sweeping from bottom-left to an amber pin at top-right.
 // Same artwork as public/logo.svg — keep the two in sync.
+// Aisle/route/pin colors are set per theme via the .af-logo-* classes in AisleFinder.jsx;
+// the pin dot matches the tile behind the logo so it reads as a cutout.
 const Logo = ({ size = 24 }) => (
   <svg width={size} height={size} viewBox="0 0 64 64" aria-label="AisleFinder logo" role="img">
-    <path className="af-logo-wall-l" d="M4 58 L28 12 L32 12 L14 58 Z" fill="#1a9c4e"/>
-    <path className="af-logo-wall-r" d="M60 58 L36 12 L32 12 L50 58 Z" fill="#157a40"/>
-    <path d="M44 28 L38 28" stroke="#aaf0ce" strokeWidth="3.5" strokeLinecap="round"/>
-    <path d="M32 56 C32 42 40 28 46 19" fill="none" stroke="#f5a623" strokeWidth="2.5" strokeDasharray="2 6.5" strokeLinecap="round"/>
-    <path d="M46 2 c4.2 0 6.8 3.1 6.8 6.5 C52.8 14 46 19 46 19 S39.2 14 39.2 8.5 C39.2 5.1 41.8 2 46 2 Z" fill="#f5a623"/>
-    <circle cx="46" cy="8" r="2.5" fill="#fff"/>
+    <rect className="af-logo-aisle" x="8" y="14" width="7" height="40" rx="3.5" fill="#1f5fa0"/>
+    <rect className="af-logo-aisle" x="21" y="14" width="7" height="40" rx="3.5" fill="#1f5fa0" opacity="0.55"/>
+    <rect className="af-logo-aisle" x="34" y="14" width="7" height="40" rx="3.5" fill="#1f5fa0"/>
+    <rect className="af-logo-aisle" x="47" y="14" width="7" height="40" rx="3.5" fill="#1f5fa0" opacity="0.55"/>
+    <path className="af-logo-route" d="M6 58 C13 46 19 50 24 39 C29 28 35 32 40 21" fill="none" stroke="#ffb52e" strokeWidth="2.4" strokeDasharray="2 5.4" strokeLinecap="round"/>
+    <path className="af-logo-pin" d="M44 7 c3.7 0 5.9 2.7 5.9 5.6 C49.9 17.4 44 22.3 44 22.3 S38.1 17.4 38.1 12.6 C38.1 9.7 40.3 7 44 7 Z" fill="#ffb52e"/>
+    <circle cx="44" cy="12.5" r="2" fill="var(--af-logo-tile, #ffffff)"/>
   </svg>
 );
 
