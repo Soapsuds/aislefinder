@@ -179,6 +179,11 @@ def item_details():
         return _server_error('fetching item details', e)
 
 
+class _PhotoCaptureUnavailable(Exception):
+    """Raised when Claude can't be reached for a reason the caller can't fix
+    (out of API credits, bad/revoked key) — a clean 503, not a 500."""
+
+
 @grocery_bp.route('/api/photo-to-list', methods=['POST'])
 @rate_limited
 def photo_to_list():
@@ -214,6 +219,11 @@ def photo_to_list():
         items = _extract_items_from_photo(raw, photo.mimetype)
         return jsonify({'items': items[:MAX_ITEMS_PER_REQUEST]}), 200
 
+    except _PhotoCaptureUnavailable:
+        # Same message/status as the unset-key case above: the frontend
+        # already treats 503 as "try again later" without inspecting the body.
+        return jsonify({'error': 'Photo capture is not configured on the server'}), 503
+
     except Exception as e:
         return _server_error('reading grocery list photo', e)
 
@@ -224,50 +234,59 @@ def _extract_items_from_photo(image_bytes, media_type):
     # suite) don't need the anthropic package installed
     import anthropic
 
-    response = anthropic.Anthropic().messages.create(
-        model='claude-opus-4-8',
-        max_tokens=16000,
-        # Reading a list is simple extraction — low effort keeps the round
-        # trip fast and cheap without hurting accuracy
-        output_config={
-            'effort': 'low',
-            'format': {
-                'type': 'json_schema',
-                'schema': {
-                    'type': 'object',
-                    'properties': {
-                        'items': {'type': 'array', 'items': {'type': 'string'}},
+    try:
+        response = anthropic.Anthropic().messages.create(
+            model='claude-opus-4-8',
+            max_tokens=16000,
+            # Reading a list is simple extraction — low effort keeps the round
+            # trip fast and cheap without hurting accuracy
+            output_config={
+                'effort': 'low',
+                'format': {
+                    'type': 'json_schema',
+                    'schema': {
+                        'type': 'object',
+                        'properties': {
+                            'items': {'type': 'array', 'items': {'type': 'string'}},
+                        },
+                        'required': ['items'],
+                        'additionalProperties': False,
                     },
-                    'required': ['items'],
-                    'additionalProperties': False,
                 },
             },
-        },
-        messages=[{
-            'role': 'user',
-            'content': [
-                {
-                    'type': 'image',
-                    'source': {
-                        'type': 'base64',
-                        'media_type': media_type,
-                        'data': base64.standard_b64encode(image_bytes).decode('ascii'),
+            messages=[{
+                'role': 'user',
+                'content': [
+                    {
+                        'type': 'image',
+                        'source': {
+                            'type': 'base64',
+                            'media_type': media_type,
+                            'data': base64.standard_b64encode(image_bytes).decode('ascii'),
+                        },
                     },
-                },
-                {
-                    'type': 'text',
-                    'text': (
-                        'This photo shows a grocery/shopping list. Extract every item '
-                        'on it, one entry per item, in the order written. Keep any '
-                        'quantity the writer included ("2 lb chicken"), skip items '
-                        'that are crossed out, and ignore headings or anything that '
-                        'is not a list item. If the photo does not contain a list, '
-                        'return an empty items array.'
-                    ),
-                },
-            ],
-        }],
-    )
+                    {
+                        'type': 'text',
+                        'text': (
+                            'This photo shows a grocery/shopping list. Extract every item '
+                            'on it, one entry per item, in the order written. Keep any '
+                            'quantity the writer included ("2 lb chicken"), skip items '
+                            'that are crossed out, and ignore headings or anything that '
+                            'is not a list item. If the photo does not contain a list, '
+                            'return an empty items array.'
+                        ),
+                    },
+                ],
+            }],
+        )
+    except anthropic.APIStatusError as e:
+        # Credit exhaustion, a revoked/invalid key, etc: nothing the caller
+        # can retry their way out of, so surface it as "unavailable" rather
+        # than a generic 500.
+        if e.type in ('billing_error', 'authentication_error', 'permission_error'):
+            raise _PhotoCaptureUnavailable(str(e)) from e
+        raise
+
     if response.stop_reason == 'refusal':
         return []
     text = next(block.text for block in response.content if block.type == 'text')

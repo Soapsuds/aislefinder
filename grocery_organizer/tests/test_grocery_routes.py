@@ -288,6 +288,35 @@ class TestPhotoToList:
             response = self._post_photo(client, data=blob)
         assert response.status_code == 413
 
+    def test_out_of_credits_is_clean_503(self, client):
+        with patch.dict(os.environ, {'ANTHROPIC_API_KEY': 'test-key'}), \
+             patch.object(grocery_routes, '_extract_items_from_photo',
+                           side_effect=grocery_routes._PhotoCaptureUnavailable('out of credits')):
+            response = self._post_photo(client)
+        assert response.status_code == 503
+        assert 'not configured' in response.get_json()['error']
+
+    def test_billing_error_from_anthropic_becomes_unavailable(self):
+        """A real Anthropic 'insufficient credits' response should be
+        translated to _PhotoCaptureUnavailable, not bubble up as a 500."""
+        import httpx
+        import anthropic
+
+        req = httpx.Request('POST', 'https://api.anthropic.com/v1/messages')
+        resp = httpx.Response(400, request=req, json={
+            'error': {
+                'type': 'billing_error',
+                'message': 'Your credit balance is too low to access the Claude API.',
+            },
+        })
+        billing_error = anthropic.BadRequestError('boom', response=resp, body=resp.json())
+
+        with patch.dict(os.environ, {'ANTHROPIC_API_KEY': 'test-key'}), \
+             patch('anthropic.Anthropic') as mock_client:
+            mock_client.return_value.messages.create.side_effect = billing_error
+            with pytest.raises(grocery_routes._PhotoCaptureUnavailable):
+                grocery_routes._extract_items_from_photo(b'fake-jpeg-bytes', 'image/jpeg')
+
 
 def test_health(client):
     response = client.get('/api/health')

@@ -61,7 +61,8 @@
       "Bash(crontab -l)",
       "Read(//Users/hayleybuchman/**)",
       "Bash(kill 15738 15737)",
-      "Bash(lsof -nP -iTCP:3000 -sTCP:LISTEN)"
+      "Bash(lsof -nP -iTCP:3000 -sTCP:LISTEN)",
+      "Skill(artifact-design)"
     ],
     "deny": [],
     "ask": []

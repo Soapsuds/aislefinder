@@ -2,181 +2,298 @@ import React, { useState, useEffect, useRef } from 'react';
 import { fetchItemDetails } from '../api';
 
 // ---------------------------------------------------------------------------
-// Hardcoded humane/organic brand recommendations.
-// Certifications key: "Certified Humane" = Humane Farm Animal Care program;
-// "USDA Organic" = no synthetic hormones/pesticides, higher welfare floors;
-// "GAP Step 5+" = Global Animal Partnership highest tier.
+// Label-buzzword glossary: what grocery label terms mean and don't mean.
+// type: 'certification' = independent third-party audit;
+//       'regulated'     = legally defined claim (USDA/FDA);
+//       'marketing'     = no legal definition / unenforced.
+// patterns detect the term on the item or product name; notWhen suppresses a
+// match when a more specific term is present (e.g. "Certified Humane" should
+// not also trigger the generic "Humane").
 // ---------------------------------------------------------------------------
-const HUMANE_DB = {
-  eggs: {
-    label: 'Eggs',
-    brand: "Pete & Gerry's Organic",
-    certifications: ['Certified Humane', 'USDA Organic'],
-    priceNote: '~$5–6/dozen',
-    why: 'Best balance of certified humane welfare + organic standards at a mid-range price. Hens have genuine outdoor access.',
-    alsoConsider: ['Happy Egg (Certified Humane, ~$4–5/doz)', 'Vital Farms (pasture-raised gold standard, ~$8–10/doz)'],
+const BUZZWORDS = [
+  {
+    id: 'usda-organic',
+    term: 'USDA Organic',
+    type: 'regulated',
+    patterns: [/\borganic\b/i],
+    appliesTo: ['any'],
+    means: 'Grown or raised without synthetic pesticides or fertilizers; animals get organic feed, no antibiotics or added hormones, and some outdoor access. USDA-audited.',
+    doesntMean: "Pasture-raised, more nutritious, or high welfare standards — the required outdoor access can be minimal.",
   },
-  milk: {
-    label: 'Milk',
-    brand: 'Horizon Organic',
-    certifications: ['USDA Organic'],
-    priceNote: '~$4–5/half-gallon',
-    why: 'Most affordable widely-available organic milk. USDA Organic rules require 120 grazing days/year and no synthetic hormones or antibiotics.',
-    alsoConsider: ['Organic Valley (pasture-raised, higher welfare, ~$5–6)', 'Store-brand organic (same USDA standards, lowest price)'],
+  {
+    id: 'certified-humane',
+    term: 'Certified Humane',
+    type: 'certification',
+    patterns: [/\bcertified humane\b/i],
+    appliesTo: ['eggs', 'dairy', 'meat', 'poultry'],
+    means: 'Audited by Humane Farm Animal Care: no cages for hens, no gestation crates, plus space and enrichment requirements.',
+    doesntMean: 'Outdoor access — indoor barns qualify unless the label also says "Free Range" or "Pasture Raised".',
   },
-  butter: {
-    label: 'Butter',
-    brand: 'Kerrygold',
-    certifications: ['Grass-Fed'],
-    priceNote: '~$4–5/8 oz',
-    why: "Irish grass-fed cows spend most of the year on pasture — meaningfully better welfare than conventional. No US organic cert but consistently high standards.",
-    alsoConsider: ['Organic Valley Pasture Butter (USDA Organic + Certified Humane, ~$6–7)'],
+  {
+    id: 'gap',
+    term: 'Animal Welfare Certified (GAP)',
+    type: 'certification',
+    patterns: [/\banimal welfare certified\b/i, /\bglobal animal partnership\b/i, /\bGAP\b/],
+    appliesTo: ['eggs', 'meat', 'poultry'],
+    means: "Global Animal Partnership's tiered, audited program (Steps 1–5+); higher steps mean outdoor and pasture access.",
+    doesntMean: 'A high standard by itself — Step 1 is little more than no cages or crates. Check the step number.',
   },
-  cheese: {
-    label: 'Cheese',
-    brand: 'Horizon Organic',
-    certifications: ['USDA Organic'],
-    priceNote: 'similar to conventional',
-    why: 'Often priced near conventional cheese while still meeting USDA Organic welfare floors — no synthetic hormones, no antibiotics, pasture access required.',
-    alsoConsider: ['Organic Valley (stricter co-op standards)', 'Tillamook (better-than-average conventional, transparent practices)'],
+  {
+    id: 'american-humane',
+    term: 'American Humane Certified',
+    type: 'certification',
+    patterns: [/\bamerican humane\b/i],
+    appliesTo: ['eggs', 'dairy', 'meat', 'poultry'],
+    means: 'Third-party audited welfare basics: food, water, air quality, and humane handling.',
+    doesntMean: 'The strictest standard — its bar is lower than Certified Humane, and some caged and crowded systems still pass.',
   },
-  yogurt: {
-    label: 'Yogurt',
-    brand: 'Stonyfield Organic',
-    certifications: ['USDA Organic', 'Non-GMO'],
-    priceNote: '~$5–6/32 oz',
-    why: 'Large-size containers bring the per-serving cost near conventional. No artificial hormones or antibiotics; strong pasture-access commitments.',
-    alsoConsider: ['Maple Hill (100% grass-fed organic, premium)', 'Store-brand organic plain yogurt (same USDA standards, cheapest)'],
+  {
+    id: 'non-gmo',
+    term: 'Non-GMO Project Verified',
+    type: 'certification',
+    patterns: [/\bnon[- ]?gmo\b/i],
+    appliesTo: ['any'],
+    means: 'Ingredients are verified to avoid genetically modified organisms.',
+    doesntMean: 'Organic, pesticide-free, healthier, or anything about animal welfare.',
   },
-  cream: {
-    label: 'Cream',
-    brand: 'Horizon Organic',
-    certifications: ['USDA Organic'],
-    priceNote: '~$4–5/pint',
-    why: 'Usually the lowest-priced USDA Organic cream at mainstream grocery stores — same welfare floors as more expensive organic brands.',
-    alsoConsider: ['Organic Valley (pasture-raised, ~$1–2 more per pint)'],
+  {
+    id: 'cage-free',
+    term: 'Cage-Free',
+    type: 'regulated',
+    patterns: [/\bcage[- ]free\b/i],
+    appliesTo: ['eggs'],
+    means: "Hens aren't kept in cages — they can walk, spread their wings, and lay in nest boxes.",
+    doesntMean: 'Outdoor access — most cage-free hens live their whole lives indoors, often in crowded barns.',
   },
-  chicken: {
-    label: 'Chicken',
-    brand: 'Smart Chicken',
-    certifications: ['Certified Humane', 'No Antibiotics Ever'],
-    priceNote: '~$6–8/lb',
-    why: 'Air-chilled and Certified Humane, typically $1–2/lb less than Bell & Evans. Wide distribution in Kroger-family stores.',
-    alsoConsider: ['Bell & Evans (slightly more premium welfare standards, ~$8–10/lb)'],
+  {
+    id: 'free-range',
+    term: 'Free-Range',
+    type: 'regulated',
+    patterns: [/\bfree[- ]range\b/i, /\bfree[- ]roaming\b/i],
+    appliesTo: ['eggs', 'poultry'],
+    means: 'USDA requires the birds have some access to the outdoors.',
+    doesntMean: "Time outside is guaranteed — the \"outdoors\" can be a small screened porch, and many birds never use it.",
   },
-  beef: {
-    label: 'Beef',
-    brand: "Laura's Lean Beef",
-    certifications: ['American Humane Certified', 'No Added Hormones'],
-    priceNote: '~$5–6/lb (96% lean)',
-    why: 'American Humane Certified and consistently the most affordable humane-labeled beef at Kroger. Extra-lean cuts.',
-    alsoConsider: ['Niman Ranch (Certified Humane, all cuts, ~$7–9/lb)', 'Panorama Organic Grass-Fed (~$7–9/lb)'],
+  {
+    id: 'pasture-raised',
+    term: 'Pasture-Raised',
+    type: 'marketing',
+    patterns: [/\bpasture[- ]raised\b/i],
+    appliesTo: ['eggs', 'dairy', 'meat', 'poultry'],
+    means: "Animals raised outdoors on pasture — the highest-welfare setup when it's actually verified.",
+    doesntMean: 'Anything enforceable on its own — there is no legal definition. Meaningful when paired with Certified Humane (108 sq ft per hen) or Animal Welfare Approved.',
   },
-  pork: {
-    label: 'Pork',
-    brand: 'Applegate Naturals',
-    certifications: ['Certified Humane', 'No Antibiotics Ever'],
-    priceNote: '~$6–8/lb (bacon/sausage)',
-    why: 'Certified Humane with no gestation crates and no antibiotics. Best value among humane pork brands; widely stocked at Kroger.',
-    alsoConsider: ['Niman Ranch (Certified Humane, whole cuts and ground pork)'],
+  {
+    id: 'grass-fed',
+    term: 'Grass-Fed',
+    type: 'marketing',
+    patterns: [/\bgrass[- ]fed\b/i],
+    appliesTo: ['dairy', 'meat'],
+    means: 'Cattle ate grass and forage rather than grain, usually implying time on pasture.',
+    doesntMean: 'A verified claim — the USDA withdrew its grass-fed standard in 2016. Look for "100% grass-fed" or a third-party certifier.',
   },
-  turkey: {
-    label: 'Turkey',
-    brand: "Mary's Free Range",
-    certifications: ['Certified Humane', 'No Antibiotics Ever'],
-    priceNote: '~$5–7/lb',
-    why: 'Certified Humane and air-chilled; one of the more accessible humane turkey options in mainstream grocery stores.',
-    alsoConsider: ['Diestel (Certified Humane, pasture-raised option, similar price)'],
+  {
+    id: 'no-antibiotics',
+    term: 'No Antibiotics Ever',
+    type: 'regulated',
+    patterns: [/\bno antibiotics\b/i, /\braised without antibiotics\b/i, /\bantibiotic[- ]free\b/i],
+    appliesTo: ['eggs', 'dairy', 'meat', 'poultry'],
+    means: 'The animal was never given antibiotics; the claim is USDA-reviewed.',
+    doesntMean: 'Better living conditions — it says nothing about space, outdoor access, or humane treatment.',
   },
-  lamb: {
-    label: 'Lamb',
-    brand: 'Atkins Ranch',
-    certifications: ['New Zealand Pasture-Raised'],
-    priceNote: '~$10–12/lb',
-    why: "New Zealand's year-round pasture system is the norm, not a premium add-on — you get high welfare standards at a lower price than US specialty lamb.",
-    alsoConsider: ["Shepherd's Pride (US, Animal Welfare Certified)"],
+  {
+    id: 'no-hormones',
+    term: 'No Added Hormones',
+    type: 'regulated',
+    patterns: [/\bno (added )?hormones?\b/i, /\braised without (added )?hormones\b/i, /\bhormone[- ]free\b/i],
+    appliesTo: ['dairy', 'meat'],
+    means: 'No growth hormones were given — a meaningful claim on beef and dairy.',
+    doesntMean: 'Anything on chicken, turkey, or pork — federal law already bans hormones there, so the label just restates the legal minimum.',
+  },
+  {
+    id: 'humane',
+    term: 'Humane / Humanely Raised',
+    type: 'marketing',
+    patterns: [/\bhumanely?\b/i],
+    notWhen: [/\bcertified humane\b/i, /\bamerican humane\b/i],
+    appliesTo: ['eggs', 'dairy', 'meat', 'poultry'],
+    means: "Whatever the producer decides it means — there's no legal definition and no required audit.",
+    doesntMean: 'Certified welfare standards. Trust it only alongside a certification like Certified Humane or Animal Welfare Certified.',
+  },
+  {
+    id: 'natural',
+    term: 'Natural',
+    type: 'marketing',
+    patterns: [/\bnatural\b/i],
+    appliesTo: ['any'],
+    means: 'For meat: minimally processed, no artificial ingredients. For everything else: almost nothing — the FDA has no definition.',
+    doesntMean: 'Anything about how the animal lived, pesticides, hormones, or health. One of the least meaningful words on a label.',
+  },
+  {
+    id: 'farm-fresh',
+    term: 'Farm Fresh',
+    type: 'marketing',
+    patterns: [/\bfarm[- ]fresh\b/i],
+    appliesTo: ['eggs', 'dairy'],
+    means: "Nothing — it's imagery, not a standard. Every egg comes from a farm.",
+    doesntMean: 'Small farms, freshness, or better welfare.',
+  },
+  {
+    id: 'vegetarian-fed',
+    term: 'Vegetarian-Fed',
+    type: 'marketing',
+    patterns: [/\bvegetarian[- ]fed\b/i],
+    appliesTo: ['eggs', 'poultry'],
+    means: 'The feed contained no animal by-products.',
+    doesntMean: 'Better welfare — chickens are natural omnivores that eat insects, so this describes the feed, not the living conditions.',
+  },
+  {
+    id: 'local',
+    term: 'Local',
+    type: 'marketing',
+    patterns: [/\blocal(ly)?\b/i],
+    appliesTo: ['any'],
+    means: "Usually that the food traveled a shorter distance — but there's no legal definition of how far.",
+    doesntMean: "Small-scale, organic, or humane. A factory farm 50 miles away is still \"local\".",
+  },
+];
+
+const CATEGORY_MATCHERS = [
+  { category: 'eggs',    patterns: [/\beggs?\b/i] },
+  { category: 'dairy',   patterns: [/\bmilk\b/i, /\bhalf[- ]and[- ]half\b/i, /\bskim\b/i, /\bbutter\b/i, /\bcheese\b/i, /\bcheddar\b/i, /\bmozzarella\b/i, /\bparmesan\b/i, /\bgouda\b/i, /\bbrie\b/i, /\byogh?urt\b/i, /\bcream\b/i] },
+  { category: 'poultry', patterns: [/\bchicken\b/i, /\bturkey\b/i] },
+  { category: 'meat',    patterns: [/\bbeef\b/i, /\bsteak\b/i, /\bbrisket\b/i, /\bpork\b/i, /\bbacon\b/i, /\bham\b/i, /\bsausage\b/i, /\blamb\b/i] },
+];
+
+// Terms detected on the item/product name come first (onLabel: true), followed
+// by the other terms worth knowing for the item's category. Empty array = no card.
+export function getRelevantBuzzwords(itemName, productName) {
+  if (!itemName) return [];
+  const haystack = [itemName, productName].filter(Boolean).join(' ');
+  const matched = CATEGORY_MATCHERS.find(({ patterns }) => patterns.some(rx => rx.test(itemName)));
+  const category = matched ? matched.category : null;
+  const results = [];
+  for (const word of BUZZWORDS) {
+    const onLabel = word.patterns.some(rx => rx.test(haystack))
+      && !(word.notWhen && word.notWhen.some(rx => rx.test(haystack)));
+    const relevant = onLabel
+      || (category && (word.appliesTo.includes(category) || word.appliesTo.includes('any')));
+    if (relevant) results.push({ ...word, onLabel });
+  }
+  results.sort((a, b) => Number(b.onLabel) - Number(a.onLabel));
+  return results;
+}
+
+const TYPE_META = {
+  certification: {
+    label: 'Certification',
+    background: 'rgba(31,95,160,0.13)',
+    border: '1px solid rgba(31,95,160,0.28)',
+    color: 'var(--af-green-dark)',
+  },
+  regulated: {
+    label: 'Regulated',
+    background: 'rgba(31,95,160,0.07)',
+    border: '1px solid rgba(31,95,160,0.18)',
+    color: 'var(--af-green-dark)',
+  },
+  marketing: {
+    label: 'Marketing term',
+    background: 'var(--af-inset-bg)',
+    border: '1px solid var(--af-border)',
+    color: 'var(--af-text-muted)',
   },
 };
 
-const HUMANE_KEYWORDS = [
-  { key: 'eggs',    patterns: [/\beggs?\b/i] },
-  { key: 'milk',    patterns: [/\bmilk\b/i, /\bhalf[- ]and[- ]half\b/i, /\bskim\b/i] },
-  { key: 'butter',  patterns: [/\bbutter\b/i] },
-  { key: 'cheese',  patterns: [/\bcheese\b/i, /\bcheddar\b/i, /\bmozzarella\b/i, /\bparmesan\b/i, /\bgouda\b/i, /\bbrie\b/i] },
-  { key: 'yogurt',  patterns: [/\byogh?urt\b/i] },
-  { key: 'cream',   patterns: [/\bcream\b/i] },
-  { key: 'chicken', patterns: [/\bchicken\b/i] },
-  { key: 'beef',    patterns: [/\bbeef\b/i, /\bsteak\b/i, /\bbrisket\b/i] },
-  { key: 'pork',    patterns: [/\bpork\b/i, /\bbacon\b/i, /\bham\b/i, /\bsausage\b/i] },
-  { key: 'turkey',  patterns: [/\bturkey\b/i] },
-  { key: 'lamb',    patterns: [/\blamb\b/i] },
-];
+const TypeBadge = ({ type }) => {
+  const meta = TYPE_META[type];
+  return (
+    <span style={{
+      flexShrink: 0,
+      padding: '2px 8px',
+      borderRadius: '20px',
+      fontSize: '10px',
+      fontWeight: 700,
+      letterSpacing: '0.3px',
+      background: meta.background,
+      color: meta.color,
+      border: meta.border,
+      whiteSpace: 'nowrap',
+    }}>
+      {meta.label}
+    </span>
+  );
+};
 
-function getHumanePick(itemName) {
-  if (!itemName) return null;
-  for (const { key, patterns } of HUMANE_KEYWORDS) {
-    if (patterns.some(rx => rx.test(itemName))) return HUMANE_DB[key];
-  }
-  return null;
-}
-
-const CertBadge = ({ label }) => (
-  <span style={{
-    display: 'inline-block',
-    padding: '2px 8px',
-    borderRadius: '20px',
-    fontSize: '10px',
-    fontWeight: 700,
-    letterSpacing: '0.3px',
-    background: 'rgba(31,95,160,0.13)',
-    color: 'var(--af-green-dark)',
-    border: '1px solid rgba(31,95,160,0.28)',
-    marginRight: '4px',
-    marginBottom: '4px',
-  }}>
-    {label}
-  </span>
-);
-
-const HumanePick = ({ pick }) => (
-  <div style={{
-    marginTop: '14px',
-    padding: '13px 14px 11px',
-    background: 'var(--af-highlight-bg)',
-    border: '1px solid var(--af-highlight-border)',
-    borderRadius: '10px',
-    textAlign: 'left',
-  }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '7px' }}>
-      <i className="fa-solid fa-leaf" style={{ color: 'var(--af-green)', fontSize: '13px' }} />
-      <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.4px', color: 'var(--af-green-dark)', textTransform: 'uppercase' }}>
-        Humane Pick — {pick.label}
-      </span>
-    </div>
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '5px', flexWrap: 'wrap' }}>
-      <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--af-text)' }}>
-        {pick.brand}
-      </span>
-      {pick.priceNote && (
-        <span style={{ fontSize: '12px', color: 'var(--af-green-dark)', fontWeight: 600 }}>
-          {pick.priceNote}
+const LabelDecoder = ({ words }) => {
+  const [expandedId, setExpandedId] = useState(null);
+  return (
+    <div style={{
+      marginTop: '14px',
+      padding: '13px 14px 3px',
+      background: 'var(--af-highlight-bg)',
+      border: '1px solid var(--af-highlight-border)',
+      borderRadius: '10px',
+      textAlign: 'left',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
+        <i className="fa-solid fa-tags" style={{ color: 'var(--af-green)', fontSize: '13px' }} />
+        <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.4px', color: 'var(--af-green-dark)', textTransform: 'uppercase' }}>
+          What the labels mean
         </span>
-      )}
-    </div>
-    <div style={{ marginBottom: '7px' }}>
-      {pick.certifications.map(c => <CertBadge key={c} label={c} />)}
-    </div>
-    <div style={{ fontSize: '12px', color: 'var(--af-text-muted)', lineHeight: 1.5, marginBottom: pick.alsoConsider?.length ? '8px' : '0' }}>
-      {pick.why}
-    </div>
-    {pick.alsoConsider?.length > 0 && (
-      <div style={{ fontSize: '11px', color: 'var(--af-text-faint)', lineHeight: 1.6 }}>
-        <span style={{ fontWeight: 600 }}>Also good: </span>
-        {pick.alsoConsider.join(', ')}
       </div>
-    )}
-  </div>
-);
+      {words.map((word, i) => {
+        const expanded = expandedId === word.id;
+        return (
+          <div key={word.id} style={{ borderTop: i > 0 ? '1px solid var(--af-highlight-border)' : 'none' }}>
+            <button
+              onClick={() => setExpandedId(expanded ? null : word.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                width: '100%',
+                background: 'none',
+                border: 'none',
+                padding: '9px 0',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--af-text)', flex: 1, lineHeight: 1.3 }}>
+                {word.term}
+                {word.onLabel && (
+                  <i
+                    className="fa-solid fa-circle-check"
+                    title="On this label"
+                    style={{ marginLeft: '6px', fontSize: '11px', color: 'var(--af-green)' }}
+                  />
+                )}
+              </span>
+              <TypeBadge type={word.type} />
+              <i
+                className={`fa-solid fa-chevron-${expanded ? 'up' : 'down'}`}
+                style={{ fontSize: '10px', color: 'var(--af-text-faint)', flexShrink: 0 }}
+              />
+            </button>
+            {expanded && (
+              <div style={{ padding: '0 0 10px', fontSize: '12px', lineHeight: 1.5 }}>
+                <div style={{ color: 'var(--af-text-muted)', marginBottom: '5px' }}>
+                  <span style={{ fontWeight: 700, color: 'var(--af-text)' }}>Means: </span>
+                  {word.means}
+                </div>
+                <div style={{ color: 'var(--af-text-muted)' }}>
+                  <span style={{ fontWeight: 700, color: 'var(--af-text)' }}>Doesn't mean: </span>
+                  {word.doesntMean}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 const SHELF_ROWS = 5;
 const BAY_COLS = 5;
@@ -346,7 +463,7 @@ const ItemInfoSheet = ({ item, store, onClose }) => {
   const location = details && details.location;
   const subtitle = details
     && [details.brand, details.size, details.category].filter(Boolean).join(' · ');
-  const humanePick = getHumanePick(item);
+  const buzzwords = getRelevantBuzzwords(item, details && details.name);
 
   return (
     <div
@@ -395,7 +512,7 @@ const ItemInfoSheet = ({ item, store, onClose }) => {
         </button>
 
         <div style={{ textAlign: 'center', minHeight: '120px', paddingRight: '20px' }}>
-          {humanePick && <HumanePick pick={humanePick} />}
+          {buzzwords.length > 0 && <LabelDecoder words={buzzwords} />}
 
           {state.status === 'loading' && (
             <div style={{ padding: '30px 0', color: 'var(--af-text-muted)', fontSize: '13px' }}>
@@ -428,7 +545,7 @@ const ItemInfoSheet = ({ item, store, onClose }) => {
                   padding: '12px',
                   display: 'inline-block',
                   marginBottom: '14px',
-                  marginTop: humanePick ? '14px' : '0',
+                  marginTop: buzzwords.length > 0 ? '14px' : '0',
                 }}>
                   <img
                     src={details.image}

@@ -598,7 +598,7 @@ const AisleFinder = () => {
               position: 'absolute',
               left: `${(i % 5) * 20 + 5}%`,
               top: `${Math.floor(i / 5) * 25 + 5}%`,
-              fontSize: '60px',
+              fontSize: 'min(60px, 8vw)',
               color: 'var(--af-text-muted)',
               transform: `rotate(${(i % 4) * 15 - 22.5}deg)`,
               opacity: 0.6,

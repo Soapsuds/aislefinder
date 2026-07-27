@@ -188,7 +188,6 @@ const CurrentListScreen = ({
           ref={photoInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
           onChange={handlePhoto}
           style={{ display: 'none' }}
         />
